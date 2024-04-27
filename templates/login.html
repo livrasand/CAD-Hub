@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingresar :: CAD Hub</title>
+    <title>Iniciar sesión :: CAD Hub</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
     <style>
 
@@ -116,27 +116,6 @@ button, input, optgroup, select, textarea {
   margin: 0;
 }
     </style>
-    <script>
-function validarInput(input) {
-    // Convertir el texto a mayúsculas
-    input.value = input.value.toUpperCase();
-
-    // Eliminar espacios en blanco
-    input.value = input.value.replace(/\s/g, '');
-
-    // Limitar a 5 caracteres
-    if (input.value.length > 5) {
-        input.value = input.value.slice(0, 5);
-    }
-
-    // Permitir solo letras (A-Z)
-    input.value = input.value.replace(/[^A-Z]/g, '');
-}
-
-function convertirAMayusculas(input) {
-    input.value = input.value.toUpperCase();
-}
-</script>
 </head>
 <body>
     <div class="container">
@@ -150,20 +129,22 @@ function convertirAMayusculas(input) {
                     </div>
                 
   </header>
-  <h1 style="margin-bottom: .5em;color: #4a6da7;font-size: 30px;margin-top: 0.6em;font-weight: 700;line-height: 1.1;">Ingresar</h1>
+  <h1 style="margin-bottom: .5em;color: #4a6da7;font-size: 30px;margin-top: 0.6em;font-weight: 700;line-height: 1.1;">Iniciar sesión</h1>
   <div id="emailIntroduction" class="groupMargin" style="margin-top: 1.5rem;margin-bottom: 1rem;">
-                        Si su departamento estableció una relación de confianza con <em>CAD Hub</em>, introduzca el código de invitación que ha recibido para acceder. 
-                    </div>
-                    <form action="/access" method="POST">
-    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Código de evento:</span><br>
-    <input type="text" name="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" placeholder="ABCDE" oninput="convertirAMayusculas(this)" maxlength="5" required><br>
-    <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Acceder</button>
-</form>
+                        <p>Bienvenido al área de inicio de sesión de la administración de la asamblea asociada a tu cuenta. Por favor, inicia sesión para acceder a las herramientas y funciones de administración.</p>
 
-    <footer class="main-footer" style="text-align:center;margin-top: 1.5rem;align-items: center;">
-          <p class="margin-bottom-05">Otras opciones:</p>
-          <a class="button" href="create">Crear una cuenta</a>
-          <a class="button" href="login">Administración</a>
+                    </div>
+                    <form action="/login" method="POST">
+                    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Dirección de correo electrónico personal:</span><br>
+                    <input type="email" name="email" formcontrolname="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" required>
+                    <br>
+                    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Contraseña:</span><br>
+                    <input type="password" name="password" formcontrolname="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" required>
+                    <br>
+                    <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Iniciar sesión</button>
+                </form>
+    <footer class="main-footer" style="text-align:left;margin-top: 1.5rem;align-items: center;">
+          <a class="button" href="/">Atrás</a>
         </footer>
     </div>
 </body>

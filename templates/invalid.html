@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingresar :: CAD Hub</title>
+    <title>Iniciar sesión :: CAD Hub</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
     <style>
 
@@ -116,55 +116,23 @@ button, input, optgroup, select, textarea {
   margin: 0;
 }
     </style>
-    <script>
-function validarInput(input) {
-    // Convertir el texto a mayúsculas
-    input.value = input.value.toUpperCase();
-
-    // Eliminar espacios en blanco
-    input.value = input.value.replace(/\s/g, '');
-
-    // Limitar a 5 caracteres
-    if (input.value.length > 5) {
-        input.value = input.value.slice(0, 5);
-    }
-
-    // Permitir solo letras (A-Z)
-    input.value = input.value.replace(/[^A-Z]/g, '');
-}
-
-function convertirAMayusculas(input) {
-    input.value = input.value.toUpperCase();
-}
-</script>
 </head>
 <body>
-    <div class="container">
-        <header class="page__header grid grid--no-bleed grid--nowrap grid--cross-center margin-bottom-2" style="align-items: center;align-content: center;display: flex;">
-      <div class="margin-right-1">
-        <img src="{{ url_for('static', filename='logo-app.png') }}" width="53px">
-      </div>
-      <div class="logo-text" style="word-break: break-word;word-wrap: break-word;overflow-wrap: break-word;display: block;">
-                        <div style="font-size: 15px;color: #65605e;letter-spacing: 1px;line-height: 1.15;font-weight: 500;">Testigos de Jehová</div>
-                        <div style="font-size: 19px;color: #65605e;letter-spacing: 1px;line-height: 1.15;font-weight: 800;">Departamentos de Asambleas de Circuito</div>
-                    </div>
-                
+    <section class="grid grid--no-bleed grid--cross-center grid--column grid--main-center grid--shrink margin-vertical-2" style="text-align: center;">
+  <header class="grid__item margin-bottom-1">
+    <ptrn-icon class="p1000" icon="error" size="128"><span style="display: inline-flex;" class="p1000"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="128" width="128" style="fill:#18293f !important;">
+          <g>
+            <path d="M12,0C5.383,0,0,5.383,0,12s5.383,12,12,12s12-5.383,12-12S18.617,0,12,0z M13.645,5L13,14h-2l-0.608-9 H13.645z M12,20c-1.105,0-2-0.895-2-2c0-1.105,0.895-2,2-2c1.105,0,2,0.895,2,2C14,19.105,13.105,20,12,20z"></path>
+          </g></svg></span></ptrn-icon>
   </header>
-  <h1 style="margin-bottom: .5em;color: #4a6da7;font-size: 30px;margin-top: 0.6em;font-weight: 700;line-height: 1.1;">Ingresar</h1>
-  <div id="emailIntroduction" class="groupMargin" style="margin-top: 1.5rem;margin-bottom: 1rem;">
-                        Si su departamento estableció una relación de confianza con <em>CAD Hub</em>, introduzca el código de invitación que ha recibido para acceder. 
-                    </div>
-                    <form action="/access" method="POST">
-    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Código de evento:</span><br>
-    <input type="text" name="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" placeholder="ABCDE" oninput="convertirAMayusculas(this)" maxlength="5" required><br>
-    <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Acceder</button>
-</form>
-
-    <footer class="main-footer" style="text-align:center;margin-top: 1.5rem;align-items: center;">
-          <p class="margin-bottom-05">Otras opciones:</p>
-          <a class="button" href="create">Crear una cuenta</a>
-          <a class="button" href="login">Administración</a>
+  <h1 class="page__heading page__heading--title" style="font-size: 2rem;margin: 1.375em 0 .625em;color: #615d5c;font-weight: 400;">
+    Administración no encontrada.
+  </h1>
+  <p style="margin-left: 20%;margin-right: 20%;">Asegúrate de escribir correctamente tu correo y contraseña. Si has olvidado tu contraseña, revisa tu correo electrónico de registro. Ahí encontrarás tus datos de la cuenta. Si has extraviado tu correo, lamentablemente no podemos recuperarlo. Por favor envía una solicitud nueva.</p>
+  <p class="page__subheading page__subheading--tertiary"></p>
+  <footer class="main-footer" style="text-align:center;margin-top: 1.5rem;align-items: center;">
+          <a class="button" onclick="window.history.back()">Volver</a>
         </footer>
-    </div>
+</section>
 </body>
 </html>
