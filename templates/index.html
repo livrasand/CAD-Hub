@@ -10,12 +10,9 @@
         @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
 
         body {
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             background-color: #f8f8f7;
             line-height: 1.45;
             font-size: 1rem;
@@ -155,7 +152,7 @@ function convertirAMayusculas(input) {
                         Si su departamento estableció una relación de confianza con <em>CAD Hub</em>, introduzca el código de invitación que ha recibido para acceder. 
                     </div>
                     <form action="/access" method="POST">
-    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Código de evento:</span><br>
+    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Código de su asamblea:</span><br>
     <input type="text" name="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" placeholder="ABCDE" oninput="convertirAMayusculas(this)" maxlength="5" required><br>
     <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Acceder</button>
 </form>
@@ -164,7 +161,10 @@ function convertirAMayusculas(input) {
           <p class="margin-bottom-05">Otras opciones:</p>
           <a class="button" href="create">Crear una cuenta</a>
           <a class="button" href="login">Administración</a>
+          <a class="button" href="https://opencollective.com/kingdom-hall-attendant" target="_blank" style="background-color: #FFC700;border: 1px solid #B8860B;color: #4a3604;margin-top: 10px;width: auto;">Donar</a>
         </footer>
+
+          <p class="margin-bottom-05" style="font-size:8px;margin-top: 25px;color: #959594;"><em>CAD Hub no mantiene afiliación alguna con JW.ORG ni cuenta con respaldo por parte de la sociedad Watch Tower Bible and Tract. Este proyecto es completamente independiente y opera de manera autónoma bajo la administración de <a href="https://livrasand.github.io/" target="_blank" style="color:#959594;text-decoration: none;">Livrädo Sandoval</a>.</em></p>
     </div>
 </body>
 </html>
