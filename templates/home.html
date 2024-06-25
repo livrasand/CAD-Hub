@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administración :: CAD Hub</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
+    <meta name="robots" content="noindex">
     <style>
 
         @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
@@ -181,6 +182,162 @@ a {
   margin-right: .2rem;
   width: 12px;
 }
+
+.grid--wrap-gutter > .grid__item {
+  margin-bottom: 1rem;
+}
+.grid__item--16 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+.grid__item {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  margin-bottom: 2rem;
+}
+.card, .filters-v2 {
+  border: solid 1px rgba(0,0,0,.05);
+  border-radius: 3px;
+  background-color: #f8f8f7;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.padding-0 {
+  padding: 0 !important;
+}
+.action-links--within-card .action-links__list {
+  max-width: 100%;
+  margin: 0;
+}
+.action-links__list {
+  max-width: 496px;
+  list-style-type: none;
+  padding: 0;
+}
+.action-links--within-card ptrn-action-link:first-of-type .action-links__link-item {
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.action-links--within-card .action-links__link-item {
+  padding: .75rem;
+}
+.action-links__link-item {
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  flex-grow: 1;
+  justify-content: space-between;
+  display: flex;
+  box-sizing: border-box;
+  border-bottom: 1px solid #dbe5f1;
+  
+  padding: .5rem;
+  color: #4171ae;
+}
+ptrn-icon {
+  display: inline-flex;
+}
+.icon {
+  display: inline-flex;
+}
+.action-links__icon::before {
+  display: block;
+  width: 1rem;
+  content: "";
+}
+select {
+  box-sizing: border-box;
+  border: 1px solid #a7a7a7;
+  border-radius: 4px;
+  background-color: #ffffff;
+  background-color: var(--dc-input-bgColor, #ffffff);
+  font-size: 1em;
+  color: #292929;
+  color: var(--du-color--textDefault, #292929);
+  padding: 8px;
+}
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
+  box-sizing: border-box;
+  border: 1px solid #a7a7a7;
+  border-radius: 4px;
+  background-color: #ffffff;
+  background-color: var(--dc-input-bgColor, #ffffff);
+  font-size: 1em;
+  color: #292929;
+  color: var(--dc-input-color, #292929);
+  padding: 8px;
+}
+button, select {
+  text-transform: none;
+}
+select {
+  font: inherit;
+    font-size: inherit;
+  margin: 0;
+}
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+elemento {
+}
+.publication-filters label, .publication-filters .pub-filter, .publication-filters .inputSearchButton {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+input.primaryButton, input.secondaryButton {
+  border: 1px solid rgba(18,18,18,.1);
+}
+input[type="submit"] {
+  border: 0;
+  margin: 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  border-radius: 0;
+}
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+.primaryButton {
+  -webkit-box-pack: center;
+  justify-content: center;
+}
+.inputSearchButton {
+  padding: 2px 7px;
+  color: #fff;
+}
+.pub-ijw13fr.FamilyWorshipProjectPage .bodyTxtAlt a, .bodyTxtAlt.btnDownload a, a.jsTourBrochureDownload, .primaryButton {
+  background-color: #4a6da7;
+}
+.expandButton .expandButton-border, .syn-body .btnDownload a, .pub-ijw13fr.FamilyWorshipProjectPage .bodyTxtAlt a, .bodyTxtAlt.btnDownload a, a.jsTourBrochureDownload, .primaryButton, .secondaryButton, .tertiaryButton {
+  display: -webkit-inline-box;
+  display: inline-flex;
+  -webkit-box-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 2px;
+  margin-bottom: 5px;
+  min-width: 36px;
+  min-height: 36px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(18, 18, 18, 0.1);
+  border-color: var(--dc-button-borderColor, rgba(18, 18, 18, 0.1));
+  cursor: pointer;
+}
+input {
+  line-height: normal;
+  overflow: visible;
+}
+button, input, optgroup, textarea {
+  color: inherit;
+  font: inherit;
+    line-height: inherit;
+  margin: 0;
+}
     </style>
 </head>
 <body>
@@ -195,55 +352,141 @@ a {
   </nav>
 </body>
   <main style="margin-right: 10%;margin-left: 10%;">
-    <h2 style="font-size: 1.75rem;font-weight: normal;margin-top: 0;margin-bottom: .5em;color: #615d5c;margin-top: 2rem">Dominio de {{ user[3] }}</h2>
-    <p class="big" style="font-size: 17px;"><strong>Usuario actual:</strong> <bdi dir="auto">{{ email}}.</bdi></p>
+    <h2 style="font-size: 1.625rem;font-weight: 500;color: #222020;margin-top: 2rem">¡Bienvenido!</h2>
+    <p class="big" style="font-size: 1.438rem;color:#74706d;font-weight: 400;font-family: monospace;margin-top: -25px;"><bdi dir="auto">{{ email }}</bdi></p>
+
+    <div class="grid__item grid__item--16 grid__item--10@medium-up" style="max-width: 555px;">
+   <!---->
+   <section class="card padding-0">
+      <ptrn-action-links cssclass="action-links--within-card">
+         <nav class="action-links action-links--within-card">
+            <ul class="action-links__list">
+               <!---->
+               <ptrn-action-link class="ng-star-inserted">
+                  <li>
+                     <a class="action-links__link-item" href="/invite">
+                        <span class="action-links__text">
+                           <ptrn-translate>Invita a un colaborador</ptrn-translate>
+                        </span>
+                        <ptrn-icon cssclass="action-links__icon" icon="chevron-right">
+                           <span class="icon action-links__icon">
+                              <svg class="icon__body--flip-rtl icon__body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20" width="20">
+                                 <g>
+                                    <path d="M8.809,23.588l-1.617-1.176L14.764,12L7.191,1.588l1.617-1.176l8,11c0.255,0.351,0.255,0.825,0,1.176 L8.809,23.588z"></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </ptrn-icon>
+                     </a>
+                  </li>
+               </ptrn-action-link>
+               <!----><!----><!---->
+               <ptrn-action-link queryparamshandling="preserve" class="ng-star-inserted">
+                  <li>
+                     <a class="action-links__link-item" href="delete">
+                        <span class="action-links__text">
+                           <ptrn-translate>Eliminar su cuenta</ptrn-translate>
+                        </span>
+                        <ptrn-icon cssclass="action-links__icon" icon="chevron-right">
+                           <span class="icon action-links__icon">
+                              <svg class="icon__body--flip-rtl icon__body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="20" width="20">
+                                 <g>
+                                    <path d="M8.809,23.588l-1.617-1.176L14.764,12L7.191,1.588l1.617-1.176l8,11c0.255,0.351,0.255,0.825,0,1.176 L8.809,23.588z"></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </ptrn-icon>
+                     </a>
+                  </li>
+               </ptrn-action-link>
+               <!---->
+            </ul>
+         </nav>
+      </ptrn-action-links>
+   </section>
+</div>
+
 
     <div class="grid grid--main-between grid--no-bleed ">
-         <article class="notification box box--shaded-light grid__item grid__item--7@medium-up" style="-webkit-box-flex: 0;-ms-flex: 0 0 43.75%;flex: 0 0 43.75%;width:43.75%;min-width: 300px;background-color: #f8f8f7;border: 1px solid #e7e6e4;padding: 10px;margin: 0 0 20px;"><section class="notification__content grid__item grid__item--cross-start"><h3 style="color: #615d5c;font-size: 1.25rem;font-weight: 400;margin-bottom: .5em;">Departamentos</h3><ul>
-          <li><a href="/presidencia_ADMIN">Presidencia</a></li>
-          <li><a href="/administracion_ADMIN">Administración</a></li>
-          <li><a href="/acomodadores_ADMIN">Acomodadores</a></li>
-          <li><a href="/instalacion_ADMIN">Instalación</a></li>
-          <li><a href="/bautismo_ADMIN">Bautismo</a></li>
-          <li><a href="/primeros_auxilios_ADMIN">Primeros auxilios</a></li>
-          <li><a href="/limpieza_ADMIN">Limpieza</a></li>
-          <li><a href="/guardarropa_objetos_perdidos_ADMIN">Guardarropa y objetos perdidos</a></li>
-          <li><a href="/plataforma_ADMIN">Plataforma</a></li>
-          <li><a href="/estacionamiento_ADMIN">Estacionamiento</a></li>
-          <li><a href="/audio_video_ADMIN">Audio y video</a></li>
-          <li><a href="/contabilidad_ADMIN">Contabilidad</a></li>
-          <li><a href="/agua_purificada_ADMIN">Agua purificada</a></li>
-        </ul></section></article>
+         <article class="notification box box--shaded-light grid__item grid__item--7@medium-up" style="-webkit-box-flex: 0;-ms-flex: 0 0 43.75%;flex: 0 0 43.75%;width:43.75%;min-width: 300px;background-color: #f8f8f7;border: 1px solid #e7e6e4;padding: 10px;margin: 0 0 20px;"><section class="notification__content grid__item grid__item--cross-start"> <h3 style="color: #615d5c;font-size: 1rem;font-weight: 400;margin-bottom: .5em;">Selecciona un evento de esta administración para ver los informes recibidos:</h3>
+            <form id="eventoForm" method="post" action="/ver-informes" style="margin-bottom: 5px;">
+    <select name="evento" id="eventoSelect">
+        {% for event in events %}
+            <option value="{{ event[1] }}">{{ event[1] }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Ver informes" class="primaryButton inputSearchButton" style="padding: 10px;font-size: 14px;">
+</form></section></article>
       </div>
 
       <app-receipts-list class="ng-star-inserted"><section class="page page--large"><header class="page__header"><p ptrntranslate="" class="page__prefix-heading" style="font-size: 1rem;word-break: break-word;word-wrap: break-word;overflow-wrap: break-word;display: block;font-weight: 400;line-height: 1.25;text-transform: uppercase;letter-spacing: .025rem;color: #74706d;">Asambleas de circuito</p><h1 class="page__heading page__heading--title" style="font-size: 1.938rem;word-break: break-word;word-wrap: break-word;overflow-wrap: break-word;font-weight: 500;line-height: 1.25;color: #222020;margin-top: -10px;"><ptrn-translate>Historial de códigos de eventos</ptrn-translate></h1></header><p ptrntranslate="" class="page__text-block" style="margin: 1rem 0;
     margin-top: 1rem;font-size: 1rem;">A continuación se muestran los códigos de los eventos efectuados por esta administración.</p><!----><!---->
-    <li class="grid__item grid__item--16 grid__item--8@medium-up margin-bottom-1 ng-scope">
+    
          <article class="empty-card empty-card__content empty-card--primary" role="button" tabindex="0">
-            <jwo-button flat="true" type="button" button-class="button--has-icon"  class="ng-isolate-scope"><button class="button hide-for-print button--has-icon button--flat" type="button">
-   <ng-transclude>
-              
-               Crear nuevo evento
+          <form id="loginForm" action="/crear_evento" method="post">
+    <jwo-button flat="true" type="button" button-class="button--has-icon" class="ng-isolate-scope">
+        <button class="button hide-for-print button--has-icon button--flat" type="submit">
+            <ng-transclude>
+                Crear nuevo evento
             </ng-transclude>
-</button><!-- end ngIf: !$ctrl.disabled && !$ctrl.loading -->
+        </button>
+        <!-- end ngIf: !$ctrl.disabled && !$ctrl.loading -->
+        <!-- ngIf: $ctrl.disabled && !$ctrl.loading -->
+        <!-- ngIf: $ctrl.loading -->
+    </jwo-button>
+    <!-- Agrega un input oculto para el correo electrónico -->
+    <input type="hidden" id="userEmail" name="userEmail">
+</form>
 
-<!-- ngIf: $ctrl.disabled && !$ctrl.loading -->
-
-<!-- ngIf: $ctrl.loading -->
-</jwo-button>
          </article>
-      </li>
+      
       <br>
   {% for code in codes %}
-  <div style="border: 1px solid #e7e6e4;padding: 15px;">
-  <p style="font-size: .8rem;color: #76726f;font-weight: normal;">{{ code[1] }}</p>
-  <div class="grid__item grid__item--shrink" style="background-color: #d5d4d2 !important;width: 45px;padding: 20px;margin-bottom: 10px;">
+  <div style="border: 1px solid #e7e6e4;padding: 15px;margin-bottom: 10px;">
+  <p style="font-size: .8rem;color: #76726f;font-weight: normal;">Creado el: {{ code[1] }}</p>
+  <div class="grid__item grid__item--shrink" style="background-color: #d5d4d2 !important;padding: 20px;margin-bottom: 10px;width: 90px;">
     <p class="margin-0 bg-g200 padding-025" style="display: inline; overflow-wrap: break-word; font-family: Consolas; font-size: 1em; color: #222020;">
         <kbd jwo-usercode="">{{ code[0] }}</kbd>
     </p>
       </div>
-{% endfor %}</section></app-receipts-list>
+    </div>
+{% endfor %}
+</section>
+</app-receipts-list>
     <br><br>
   </div>
+
+  <script>
+    // Espera a que el documento esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtén el formulario por su ID
+        var form = document.getElementById('loginForm');
+
+        // Agrega un event listener para el evento 'submit' del formulario
+        form.addEventListener('submit', function(event) {
+            // Evita el envío del formulario por defecto
+            event.preventDefault();
+
+            // Obtén el correo electrónico del usuario desde sessionStorage
+            var userEmail = sessionStorage.getItem('userEmail');
+
+            // Verifica si se capturó el correo electrónico
+            if (userEmail) {
+                // Obtén el input oculto por su ID
+                var userEmailInput = document.getElementById('userEmail');
+
+                // Asigna el correo electrónico al input oculto
+                userEmailInput.value = userEmail;
+
+                // Envía el formulario de manera programática
+                form.submit();
+            } else {
+                // Muestra un mensaje de error si no se capturó el correo electrónico
+                alert('No se ha capturado el correo electrónico del usuario.');
+            }
+        });
+    });
+</script>
+
 </main>
 </html>

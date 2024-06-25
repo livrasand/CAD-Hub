@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear una cuenta :: CAD Hub</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
+    <meta name="robots" content="noindex">
     <style>
 
         @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
 
         body {
-            margin: 0;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f8f7;
             line-height: 1.45;
             font-size: 1rem;
             color: #373433;
@@ -19,16 +22,15 @@
         }
         
         .container {
+            width: 100%;
+            max-width: calc(496px + 2rem);
+            height: auto;
             background-color: #ffffff; /* Color de fondo del recuadro */
-            padding: 30px; /* Espacio interior del recuadro */
+            border: solid 2.5px rgba(0,0,0,.05);
+            border-radius: 3px;
+            padding: 20px; /* Espacio interior del recuadro */
             text-align: left; /* Alineación del texto */
         }
-
-        @media (min-width: 600px) {
-  .container {
-    padding: 50px; /* Incrementa el padding para pantallas más grandes */
-  }
-}
 
         .margin-right-1 {
   margin-inline-end: 1rem !important;
@@ -120,27 +122,27 @@ button, input, optgroup, select, textarea {
         <img src="{{ url_for('static', filename='logo-app.png') }}" width="53px">
       </div>
       <div class="logo-text" style="word-break: break-word;word-wrap: break-word;overflow-wrap: break-word;display: block;">
-                        <div style="font-size: 15px;color: #65605e;letter-spacing: 1px;line-height: 1.15;font-weight: 500;">Testigos de Jehová</div>
-                        <div style="font-size: 19px;color: #65605e;letter-spacing: 1px;line-height: 1.15;font-weight: 800;">Departamentos de Asambleas de Circuito</div>
+                        <h1 style="margin-bottom: .5em;color: #4a6da7;font-size: 30px;margin-top: 0.6em;font-weight: 500;line-height: 1.1;">Crear una cuenta</h1>
                     </div>
                 
   </header>
-  <h1 style="margin-bottom: .5em;color: #4a6da7;font-size: 30px;margin-top: 0.6em;font-weight: 700;line-height: 1.1;">Crear una cuenta</h1>
+
   <div id="emailIntroduction" class="groupMargin" style="margin-top: 1.5rem;margin-bottom: 1rem;">
                         <p>Si es superintendente de circuito, superintendente de circuito sustituto, superintendente de asamblea, superintendente de asamblea auxiliar o miembro de un comité de asambleas puede solicitar una cuenta. Puede salir de esta página en cualquier momento, si no cumple con alguna de estas categorías.</p>
-                        <p>Una vez que envíe la solicitud, le notificaremos con suficiente antelación a través del correo electrónico, proporcionándole sus datos de acceso para la próxima asamblea de circuito.</p>
+                        <p>Una vez que envíe la solicitud, le enviaremos un enlace a su correo electrónico. Por favor, revise su bandeja de entrada o su carpeta de SPAM para encontrar el enlace y completar su registro.</p>
                     </div>
-                    <form action="https://formspree.io/f/xoqgynvg"
-  method="POST">
-                    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Dirección de correo electrónico personal:</span><br>
-                    <input type="email" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="email" name="email" style="width:100%;">
-                    <br>
-                    <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Enviar</button>
-                    <p style="font-size:12px;"><em>En caso de que no haya recibido una comunicación de nuestra parte en el plazo de una semana desde el envío inicial, es posible que dicho correo haya sido filtrado inadvertidamente a la carpeta de spam o correo no deseado.</em></p>
-                </form>
+                    <form action="{{ url_for('register') }}" method="POST">
+    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Dirección correo electrónico personal:</span><br>
+    <input type="email" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="email" name="email" style="width:100%;">
+    <br>
+    <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 1.5rem;width: 100%;">Siguiente</button>
+</form>
+
     <footer class="main-footer" style="text-align:left;margin-top: 1.5rem;align-items: center;">
           <a class="button" href="/">Atrás</a>
         </footer>
     </div>
 </body>
 </html>
+
+

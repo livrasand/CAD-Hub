@@ -1,8 +1,29 @@
-from flask import Flask, render_template, request, redirect, url_for, g
+from flask import Flask, render_template, request, redirect, url_for, g, flash, session
 import sqlite3
 from datetime import datetime
+import secrets
+import os
+import shutil
+from flask_mail import Mail, Message
+import logging
+import random
+import datetime
+import string
+import uuid  
+
 
 app = Flask(__name__)
+app.secret_key = '14b9856a0a051c5e80e072f4de6dfe306f913c3ea5c946f1'
+
+# Configuración de Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'noresponder.kha@gmail.com'
+app.config['MAIL_PASSWORD'] = 'sdlj izlj wpix ipsn'
+app.config['MAIL_DEFAULT_SENDER'] = ('Join CAD Hub', 'noresponder.kha@gmail.com')
+
+mail = Mail(app)
 
 # Configura la ruta de la base de datos
 DATABASE = 'cad.db'
@@ -18,21 +39,69 @@ def get_db():
 def index():
     return render_template('index.html')
 
-# Ruta para el inicio de sesión
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/delete')
+def delete():
+    return render_template('delete.html')
+
+@app.route('/account/delete', methods=['POST'])
+def delete_account():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        if not verify_credentials(email, password):
+            flash('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
+            return redirect(url_for('account_settings'))
+
+        delete_user(email)
+
+        flash('Tu cuenta ha sido eliminada exitosamente.')
+        return redirect(url_for('index'))  # Redirigir al usuario a la página de logout o a donde sea adecuado
+    else:
+        flash('Método no permitido.')
+        return redirect(url_for('home'))
+
+def verify_credentials(email, password):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+    user = cursor.fetchone()
+    conn.close()
+    return user is not None
+
+def delete_user(email):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE email = ?", (email,))
+    conn.commit()
+    conn.close()
+
+@app.route('/email_invitation')
+def email_invitation():
+    return render_template('email_invitation.html')
+
+@app.route('/invite')
+def invite():
+    return render_template('invite.html')
+
+@app.route('/login')
 def login():
+    return render_template('login.html')
+
+@app.route('/accessing', methods=['POST'])
+def accessing():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         
-        # Verifica las credenciales en la base de datos
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM administracion WHERE email=? AND password=?", (email, password))
+        cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
         user = cursor.fetchone()
         
         if user:
-            # Redirige a la página de inicio y pasa el correo electrónico como un parámetro en la URL
+            g.email = email  # Esto debería configurar el correo electrónico en g correctamente
+            
             return redirect(url_for('home', email=email))
         else:
             return redirect(url_for('invalid'))
@@ -44,14 +113,21 @@ def home():
 
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM administracion")
+    cursor.execute("SELECT * FROM users")
     user = cursor.fetchone()
 
     id = email
     cursor.execute("SELECT code, fecha FROM events_codes WHERE id=?", (id,))
     codes = cursor.fetchall()
 
-    return render_template('home.html', user=user, codes=codes, email=email)
+    # Buscar la base de datos asociada al código del evento
+    cursor.execute("SELECT id, code FROM events_codes WHERE id=?", (id,))
+    row = cursor.fetchall()
+    print("Base de datos recibida: ", row)
+
+    users = row
+
+    return render_template('home.html', user=user, codes=codes, email=email, events=row, users=users)
 
 @app.route('/invalid')
 def invalid():
@@ -68,83 +144,188 @@ def create():
 @app.route('/access', methods=['GET', 'POST'])
 def access():
     if request.method == 'POST':
-        # Obtener el código del evento del formulario
         event_code = request.form['eventCode']
+        print(f"Event code received: {event_code}")  # Depuración
         
-        # Realizar la validación en la base de datos
         if validar_codigo(event_code):
-            return redirect('/cad')
+            if es_colaborador(event_code):
+                return redirect(url_for('cad', colaborador_code=event_code))
+            else:
+                return redirect(url_for('cad', event_code=event_code))
         else:
             return redirect('/invalid')
     else:
-        return render_template('/')
+        return render_template('index.html')
 
-# Función para validar el código del evento en la base de datos
+@app.route('/inviting', methods=['POST'])
+def inviting():
+    if request.method == 'POST':
+        email = request.form['email']
+        correo = request.form['userEmail']  # Obtiene el correo electrónico del formulario
+        code = generar_codigo()
+        guardar_codigo(correo, code)
+        enviar_invitacion(email, code)
+        return redirect('/invite')  # Redirige a una página de éxito
+    else:
+        return render_template('invite.html')
+
+def generar_codigo():
+    return ''.join(random.choices(string.digits, k=6))
+
+def guardar_codigo(correo, code):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO colaboradores (id, code) VALUES (?, ?)", (correo, code))
+    db.commit()
+
+def enviar_invitacion(email, codigo):
+    # Mensaje de la invitación con el código
+    mensaje = f"""
+    Hola, soy Livrädo Sandoval de CAD Hub.\n\n
+
+    Has sido invitado a ser colaborador en una administración de CAD Hub para tu próxima asamblea de circuito. Usa el siguiente código de acceso para acceder. ¡Esperan contar contigo!\n\n
+    
+    Tu código de acceso es: {codigo}\n\n
+    
+    Para aceptar la invitación, ve a cadhub.org e ingresa con tu código.
+    """
+    
+    # Crear un objeto de mensaje
+    msg = Message(subject="CAD Hub: Invitación a ser colaborador", recipients=[email])
+    
+    # Establecer el cuerpo del mensaje
+    msg.html = mensaje
+    
+    # Enviar el correo electrónico
+    mail.send(msg)
+    
+    print("Correo electrónico de invitación enviado a:", email, "con código:", codigo)
+
+# Función para validar si un código existe en events_codes o colaboradores
 def validar_codigo(event_code):
-    # Establecer conexión con la base de datos
     db = get_db()
     cursor = db.cursor()
     
-    # Consultar si el código existe en la tabla events_codes
     cursor.execute("SELECT id FROM events_codes WHERE code=?", (event_code,))
     row = cursor.fetchone()
-    print("Resultado de la consulta a events_codes:", row)
+    if row:
+        return True
+
+    cursor.execute("SELECT id FROM colaboradores WHERE code=?", (event_code,))
+    row = cursor.fetchone()
+    if row:
+        return True
+    
+    return False
+
+# Función para obtener la base de datos asociada a un evento
+def obtener_database_evento(event_code, cursor):
+    cursor.execute("SELECT database FROM events_codes WHERE code=?", (event_code,))
+    row = cursor.fetchone()
+    if row:
+        return row[0]
+    return None
+
+def es_colaborador(event_code):
+    db = get_db()
+    cursor = db.cursor()
+    
+    cursor.execute("SELECT id FROM colaboradores WHERE code=?", (event_code,))
+    row = cursor.fetchone()
+    
+    return row is not None
+
+# Función para obtener la base de datos asociada a un colaborador
+def obtener_database_colaborador(colaborador_code, cursor):
+    cursor.execute("SELECT id FROM colaboradores WHERE code=?", (colaborador_code,))
+    row = cursor.fetchone()
     
     if row:
-        # Si el código existe, buscar el texto de la columna 'id' en la misma fila
-        user_id = row[0]
-        cursor.execute("SELECT * FROM administracion WHERE email=?", (user_id,))
-        user_email = cursor.fetchone()
-        print("Resultado de la consulta a administracion:", user_email)
-        
-        if user_email:
-            # Si el email existe en la tabla administracion, la validación es exitosa
-            return True
+        correo = row[0]
+        cursor.execute("SELECT database FROM users WHERE email=?", (correo,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
     
-    # Cerrar la conexión a la base de datos
-
-    # Si no se encontró el código en la tabla events_codes o el email en la tabla administracion, devolver False
-    return False
+    return None
 
 # Variable global para almacenar el nombre de la base de datos
 current_database = None
 
-@app.route('/cad')
+@app.route('/cad', methods=['GET', 'POST'])
 def cad():
     global current_database
     
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
-
     cursor.execute("SELECT * FROM events_codes")
-    events = cursor.fetchone()
+    events = cursor.fetchall()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+    event_code = request.args.get('event_code')
+    colaborador_code = request.args.get('colaborador_code')
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+    user = events[0]
+    
+    if colaborador_code:
+        specific_database = obtener_database_colaborador(colaborador_code, cursor)
+        if specific_database:
+            current_database = specific_database  # Actualizar la variable global
+            db.close()
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
+            try:
+                new_db = sqlite3.connect(specific_database)
+                cursor = new_db.cursor()
 
-        # Realizar operaciones en la nueva base de datos
-        # Por ejemplo, realizar una consulta
-        # cursor.execute("SELECT * FROM tabla_en_nueva_db")
-        # data_from_new_db = cursor.fetchall()
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users';")
+                table_exists = cursor.fetchone()
+                
+                if table_exists:
+                    cursor.execute("SELECT * FROM users")
+                    users = cursor.fetchall()
+                    return render_template('cad_admin.html', users=users, events=events, current_database=current_database)
+                else:
+                    print("Tabla 'users' no encontrada en la base de datos especificada.")
+                    return render_template('cad_admin.html', users=user, events=events, error="La base de datos especificada no contiene la tabla 'users'.")
+            except sqlite3.Error as e:
+                print(f"Error al conectar con la base de datos específica: {e}")
+                return render_template('cad.html', events=events, error="Error al conectar con la base de datos específica.")
+        else:
+            print("Base de datos no encontrada para el colaborador")
+            return render_template('cad.html', events=events, error="Base de datos asociada al colaborador no encontrada.")
+    
+    elif event_code:
+        cursor.execute("SELECT database FROM events_codes WHERE code=?", (event_code,))
+        row = cursor.fetchone()
+        if row:
+            specific_database = row[0]
+            current_database = specific_database  # Actualizar la variable global
+            db.close()
 
-        print("Base de datos:", current_database)
+            try:
+                new_db = sqlite3.connect(specific_database)
+                cursor = new_db.cursor()
 
-        return render_template('cad.html', administracion=administracion, events=events)
-    else:
-        print("Base de datos no encontrada")
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users';")
+                table_exists = cursor.fetchone()
+                
+                if table_exists:
+                    cursor.execute("SELECT * FROM users")
+                    users = cursor.fetchall()
+                    return render_template('cad.html', users=users, events=events, current_database=current_database)
+                else:
+                    print("Tabla 'users' no encontrada en la base de datos especificada.")
+                    return render_template('cad.html', events=events, error="La base de datos especificada no contiene la tabla 'users'.")
+            except sqlite3.Error as e:
+                print(f"Error al conectar con la base de datos específica: {e}")
+                return render_template('cad.html', events=events, error="Error al conectar con la base de datos específica.")
+        else:
+            print("Base de datos no encontrada para el evento")
+            return render_template('cad.html', events=events, error="Base de datos asociada al evento no encontrada.")
+    
+    # Si no se proporcionó ni colaborador_code ni event_code, retornar la página inicial de cad.html
+    return render_template('cad.html', events=events)
+
 
 @app.route('/presidencia')
 @app.route('/presidencia_ADMIN')
@@ -159,35 +340,27 @@ def presidencia():
         departamento = "Presidencia"
         table = "presidencia"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y") 
     
-    db = get_db()
-    cursor = db.cursor()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            print("Base de datos en Presidencia:", current_database)
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
-
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/guardar_informe', methods=['POST'])
 def guardar_informe():
@@ -213,7 +386,9 @@ def guardar_informe():
         # Cerrar la conexión a la base de datos
         new_db.close()
 
-        return redirect('/cad')
+        # Redireccionar a /cad con el parámetro event_code actualizado
+        event_code = request.args.get('event_code', '')
+        return redirect(url_for('cad', event_code=event_code))
     else:
         # Manejar el caso cuando current_database es None
         return "Error: No se ha especificado la base de datos."
@@ -228,38 +403,29 @@ def administracion():
 
     # Verificar si se agregó "_ADMIN" a la URL
     if request.path.endswith("_ADMIN"):
-        departamento = "Administración"
+        departamento += " (ADMIN)"
         table = "administracion"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
     
-    db = get_db()
-    cursor = db.cursor()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute(f"SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    cursor.execute(f"SELECT database FROM administracion")
-    database = cursor.fetchone()
+            print("Base de datos en Administración:", current_database)
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
-
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
 
 
 @app.route('/acomodadores')
@@ -275,35 +441,26 @@ def acomodadores():
         departamento = "Acomodadores"
         table = "acomodadores"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Acomodadores:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
 
 @app.route('/instalacion')
 @app.route('/instalacion_ADMIN')
@@ -318,35 +475,26 @@ def instalacion():
         departamento = "Instalación"
         table = "instalacion"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Instalacion:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
 
 @app.route('/bautismo')
 @app.route('/bautismo_ADMIN')
@@ -361,35 +509,27 @@ def bautismo():
         departamento = "Bautismo"
         table = "bautismo"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Bautismo:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/primeros_auxilios')
 @app.route('/primeros_auxilios_ADMIN')
@@ -404,35 +544,26 @@ def primeros_auxilios():
         departamento = "Primeros auxilios"
         table = "primeros_auxilios"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y") 
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Primeros auxilios:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
 
 @app.route('/limpieza')
 @app.route('/limpieza_ADMIN')
@@ -447,35 +578,27 @@ def limpieza():
         departamento = "Limpieza"
         table = "limpieza"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Limpieza:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/guardarropa_objetos_perdidos')
 @app.route('/guardarropa_objetos_perdidos_ADMIN')
@@ -490,35 +613,27 @@ def guardarropa_objetos_perdidos():
         departamento = "Guardarropa y objetos perdidos"
         table = "guardarropa_objetos_perdidos"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y") 
     
-    db = get_db()
-    cursor = db.cursor()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            print("Base de datos en Guardarropa y objetos perdidos:", current_database)
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
-
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/plataforma')
 @app.route('/plataforma_ADMIN')
@@ -533,35 +648,27 @@ def plataforma():
         departamento = "Plataforma"
         table = "plataforma"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y") 
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Plataforma:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/estacionamiento')
 @app.route('/estacionamiento_ADMIN')
@@ -575,35 +682,27 @@ def estacionamiento():
         departamento = "Estacionamiento"
         table = "estacionamiento"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Estacionamiento:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/audio_video')
 @app.route('/audio_video_ADMIN')
@@ -617,35 +716,27 @@ def audio_video():
         departamento = "Audio y video"
         table = "audio_video"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y") 
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Audio y video:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/contabilidad')
 @app.route('/contabilidad_ADMIN')
@@ -659,35 +750,27 @@ def contabilidad():
         departamento = "Contabilidad"
         table = "contabilidad"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
-        db.close()
+            print("Base de datos en Contabilidad:", current_database)
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
-
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
-
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
     else:
-        print("Base de datos no encontrada")
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
 
 @app.route('/agua_purificada')
 @app.route('/agua_purificada_ADMIN')
@@ -701,35 +784,210 @@ def agua_purificada():
         departamento = "Agua purificada"
         table = "agua_purificada"
 
-    fecha_actual = datetime.now().strftime("%d de %B de %Y") 
-    
-    db = get_db()
-    cursor = db.cursor()
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
 
-    cursor.execute("SELECT * FROM administracion")
-    administracion = cursor.fetchone()
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
 
-    cursor.execute("SELECT database FROM administracion")
-    database = cursor.fetchone()
+            cursor.execute(f"SELECT * FROM {table}")
+            departamento_data = cursor.fetchone()
 
-    if database:
-        database_name = database[0]
-        current_database = database_name  # Actualizar la variable global
-        # Cerrar la conexión actual
+            print("Base de datos en Agua purificada:", current_database)
+
+            return render_template('detail-cad.html', users=None, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-cad.html', error="Error al conectar con la base de datos específica.")
+    else:
+        print("Base de datos no especificada")
+        return render_template('detail-cad.html', error="Base de datos no especificada.")
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
         db.close()
 
-        # Establecer una nueva conexión a la base de datos especificada
-        new_db = sqlite3.connect(database_name)
-        cursor = new_db.cursor()
+def generate_random_number_string(length=5):
+    return ''.join(random.choices('0123456789', k=length))
 
-        cursor.execute(f"SELECT * FROM {table}")
-        departamento_data = cursor.fetchone()
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        token = secrets.token_urlsafe(16)
+        confirm_url = url_for('confirm_email', token=token, _external=True)
+        requester_ip = get_requester_ip()
+        sender = app.config['MAIL_USERNAME']
+        send_email(sender, email, confirm_url, requester_ip)
+        
+        # Insertar en la base de datos
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("INSERT INTO users (email, token, database) VALUES (?, ?, ?)", (email, token, f'{email.split("@")[0]}-cadhub.db'))
+        db.commit()
+        db.close()
+        
+        # Copiar la base de datos base y renombrarla
+        try:
+            shutil.copy("cad_hub_base.db", f"{email.split('@')[0]}-cadhub.db")
+        except FileNotFoundError:
+            flash('Error: la base de datos "cad_hub_base.db" no se encontró.')
+            return redirect(url_for('register'))
+        except Exception as e:
+            flash(f'Error al copiar la base de datos: {str(e)}')
+            return redirect(url_for('register'))
+        
+        return redirect(url_for('register'))
+    return redirect(url_for('login'))
 
-        print("Base de datos:", current_database)
-
-        return render_template('detail-cad.html', administracion=administracion, departamento=departamento, departamento_data=departamento_data, fecha_actual=fecha_actual, table=table)
+def get_requester_ip():
+    if request.headers.get('X-Forwarded-For'):
+        # Para soportar aplicaciones detrás de un proxy como Nginx o Heroku
+        ip = request.headers.get('X-Forwarded-For').split(',')[0]
     else:
-        print("Base de datos no encontrada")
+        ip = request.remote_addr
+    return ip
+
+def send_email(sender, recipient, confirm_url, requester_ip):
+    msg = Message('CAD Hub: Completa tu registro', sender=sender, recipients=[recipient])
+    msg.body = (
+        f"🗝\n\n"
+        f"Hola, soy Livrädo Sandoval de CAD Hub.\n\n"
+        f"Estás a un clic de terminar tu registro en CAD Hub. Por favor, confirma tu correo "
+        f"electrónico haciendo clic en el siguiente enlace:\n{confirm_url}\n\n"
+        "💡 Consejo: ¿Quieres que CAD Hub recuerde tu contraseña la próxima vez?\n"
+        "Acepta el recordatorio de contraseñas de tu navegador.\n\n"
+        f"Este correo electrónico fue solicitado por {requester_ip}. Si no ha solicitado este registro, infórmenos a livrasand@outlook.com."
+    )
+    mail.send(msg)
+
+@app.route('/confirm')
+def confirm():
+    return render_template('confirm.html') 
+
+@app.route('/confirm/<token>', methods=['GET', 'POST'])
+def confirm_email(token):
+    # Crear una conexión directa a cavea.db
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT email FROM users WHERE token = ?", (token,))
+    result = cursor.fetchone()
+    
+    if result:
+        email = result['email']
+        if request.method == 'POST':
+            password = request.form['password']
+            
+            # Actualizar la entrada en la base de datos con la contraseña y last_login
+            now = datetime.datetime.now()
+            logging.debug(f"Actualizando last_login a: {now}")
+            cursor.execute("UPDATE users SET password = ?, last_login = ? WHERE email = ?", (password, now, email))
+            conn.commit()
+            conn.close()
+
+            flash('Correo confirmado y contraseña establecida.')
+            return redirect(url_for('login'))
+        conn.close()
+        return render_template('confirm.html', token=token)
+    else:
+        conn.close()
+        flash('El enlace de confirmación es inválido o ha expirado.')
+        return redirect(url_for('register'))
+
+@app.route('/crear_evento', methods=['POST'])
+def crear_evento():
+    # Obtener el correo del usuario que está creando el evento desde sessionStorage
+    usuario_correo = request.form.get('userEmail')
+
+    if usuario_correo is None:
+        # Si el correo del usuario no está en sessionStorage, redirige a alguna página de error o de inicio de sesión
+        return redirect('/invalid')  # Por ejemplo, si el usuario necesita iniciar sesión primero
+
+    # Generar un nuevo código de evento
+    nuevo_codigo = generar_codigo_evento()
+
+    # Guardar el nuevo código en la base de datos
+    guardar_codigo_evento(usuario_correo, nuevo_codigo)
+
+    # Crear una nueva base de datos con el nombre del código y copiar la estructura de cad_hub_base.db
+    crear_nueva_base_datos(nuevo_codigo)
+
+    return redirect(request.referrer or '/home')
+
+
+def generar_codigo_evento():
+    # Aquí puedes definir tu lógica para generar un código único, por ejemplo, utilizando el módulo uuid
+    nuevo_codigo = str(uuid.uuid4()).replace('-', '').upper()[:5]  # Ejemplo de generación de código UUID
+
+    return nuevo_codigo
+
+def guardar_codigo_evento(usuario_correo, nuevo_codigo):
+    # Establecer conexión con la base de datos principal
+    conn_principal = sqlite3.connect('cad.db')
+    cursor_principal = conn_principal.cursor()
+
+    # Insertar el nuevo código en la tabla events_codes
+    fecha_actual = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # Añadir la extensión '.db' al nombre del código al guardarlo en la columna 'database'
+    cursor_principal.execute("INSERT INTO events_codes (id, code, fecha, database) VALUES (?, ?, ?, ?)",
+                              (usuario_correo, nuevo_codigo, fecha_actual, f"{nuevo_codigo}.db"))
+    
+    # Guardar los cambios y cerrar la conexión con la base de datos principal
+    conn_principal.commit()
+    conn_principal.close()
+
+
+def crear_nueva_base_datos(nombre_codigo):
+    # Copiar la estructura de la base de datos cad_hub_base.db a una nueva base de datos con el nombre del código
+    shutil.copyfile('cad_hub_base.db', f'{nombre_codigo}.db')
+
+    # Actualizar el nombre de la base de datos en la tabla events_codes
+    conn_nueva_db = sqlite3.connect(f'{nombre_codigo}.db')
+    
+@app.route('/ver-informes', methods=['POST'])
+def ver_informes():
+    global current_database
+
+    # Obtener el código del evento seleccionado del formulario
+    event_code = request.form.get('evento')
+    print("Código de evento recibido: ", event_code)
+
+    if event_code:
+        db = get_db()
+        cursor = db.cursor()
+        
+        # Buscar la base de datos asociada al código del evento
+        cursor.execute("SELECT id, database FROM events_codes WHERE code=?", (event_code,))
+        row = cursor.fetchone()
+        print("Base de datos recibida: ", row[1])
+        if row:
+            specific_database = row[1]
+            current_database = specific_database  # Actualizar la variable global
+            db.close()
+
+            users = row[0]
+
+            print("Administración de: ", users)
+
+            try:
+                new_db = sqlite3.connect(specific_database)
+                cursor = new_db.cursor()
+                return render_template('cad_admin_select.html', users=users)
+            except sqlite3.Error as e:
+                print(f"Error al conectar con la base de datos específica: {e}")
+                return render_template('cad_admin_select.html', users=users)
+        else:
+            print("Base de datos no encontrada para el evento")
+            return render_template('cad_admin_select.html', users=users)
+    else:
+        print("No se recibió el código del evento.")
+        return render_template('cad_admin_select.html', users=users)
 
 if __name__ == '__main__':
     app.run(debug=True)

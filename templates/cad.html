@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio :: CAD Hub</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
+    <meta name="robots" content="noindex">
     <style>
 
         @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
@@ -365,35 +366,18 @@ p {
     <section class="top-nav__secondary-items-container" style="-webkit-box-pack: end;-ms-flex-pack: end;justify-content: flex-end;-ms-flex-item-align: center;align-self: center;display: -webkit-box;display: -ms-flexbox;display: flex;-ms-flex-item-align: stretch;align-self: stretch;margin-right: 0;">
                   <p class="top-nav__secondary-items" style="-ms-flex-negative: 0;
   flex-shrink: 0;-webkit-box-pack: end;-ms-flex-pack: end;justify-content: flex-end;-ms-flex-item-align: center;align-self: center;padding-right: 0.5rem;">
-                     <a class="top-nav__link top-nav__link--login" href="/" style="color: #dee7f1;font-size: 0.8rem;padding-left: 0.8rem;padding-right: 0.8rem;">CERRAR SESIÓN</a>
+                     <a class="top-nav__link top-nav__link--login" href="/" style="color: #dee7f1;font-size: 0.8rem;padding-left: 0.8rem;padding-right: 0.8rem;">SALIR</a>
                   </p>
                </section>
   </nav>
 </body>
   <main style="margin-right: 10%;margin-left: 10%;">
-    <h2 style="font-size: 1.75rem;font-weight: normal;margin-top: 0;margin-bottom: .5em;color: #615d5c;margin-top: 2rem">Circuito {{ administracion[3] }} </h2>
+    <h2 style="font-size: 1.75rem;font-weight: normal;margin-top: 0;margin-bottom: .5em;color: #615d5c;margin-top: 2rem">¡Bienvenido!</h2>
 
-<header class="small-container" id="wtd-donation-type-header" style="max-width: 550px;margin-bottom: 2rem;">
-  <donation-type-header donation-type="$ctrl.donationType" congregation="$ctrl.congregation" circuit="$ctrl.circuit" convention="$ctrl.convention" class="ng-isolate-scope"><!-- ngIf: !$ctrl.rootUrl --><!-- ngInclude: 'donate/components/donation-type-header-inner' --><div class="grid grid--no-bleed grid--nowrap grid--cross-center bg-g50 margin-top-05 ng-scope" ng-if="!$ctrl.rootUrl" ng-include="'donate/components/donation-type-header-inner'" style="-webkit-box-align: center;-ms-flex-align: center;align-items: center;-ms-flex-line-pack: center;align-content: center;"><div class="grid__item grid__item--shrink grid__item--collapse grid__item--no-resize grid__item--cross-stretch bg-jw700 ng-scope">
-   <div class="icon__donation-type">
-      <img class="icon" ng-src="{{ url_for('static', filename='logo-app.png') }}" width="68" height="" alt="" src="{{ url_for('static', filename='logo-app.png') }}" style="margin-top:5px;">
-   </div>
-</div>
-<div class="grid__item text-left padding-vertical-025 text-break ng-scope">
-   <h3 class="margin-0 ng-binding">Su asamblea de circuito</h3>
-   <!-- ngIf: $ctrl.generalConventionMsg -->
-   <!-- ngIf: !!$ctrl.subPrimary --><p class="margin-0 padding-0 text-bold font-reduce-10 ng-binding ng-scope" ng-if="!!$ctrl.subPrimary" ng-bind-html="$ctrl.subPrimary">{{ events[2] }}</p><!-- end ngIf: !!$ctrl.subPrimary -->
-   <!-- ngIf: !!$ctrl.subSecondary --><!-- end ngIf: !!$ctrl.subSecondary -->
-</div>
-<!-- ngIf: !!$ctrl.rootUrl -->
-</div><!-- end ngIf: !$ctrl.rootUrl -->
 
-<!-- ngIf: !!$ctrl.rootUrl -->
-</donation-type-header>
-</header>
 
     <div class="grid grid--main-between grid--no-bleed ">
-         <article class="notification box box--shaded-light grid__item grid__item--7@medium-up" style="-webkit-box-flex: 0;-ms-flex: 0 0 43.75%;flex: 0 0 43.75%;width:43.75%;min-width: 300px;background-color: #f8f8f7;border: 1px solid #e7e6e4;padding: 10px;margin: 0 0 20px;"><section class="notification__content grid__item grid__item--cross-start"><h3 style="color: #615d5c;font-size: 1.25rem;font-weight: 400;margin-bottom: .5em;">Seleccione su departamento:</h3><ul>
+         <article class="notification box box--shaded-light grid__item grid__item--7@medium-up" style="-webkit-box-flex: 0;-ms-flex: 0 0 43.75%;flex: 0 0 43.75%;width:43.75%;min-width: 300px;background-color: #f8f8f7;border: 1px solid #e7e6e4;padding: 10px;margin: 0 0 20px;"><section class="notification__content grid__item grid__item--cross-start"><h3 style="color: #615d5c;font-size: 1.25rem;font-weight: 400;margin-bottom: .5em;">Departamentos:</h3><ul>
           <li><a href="/presidencia">Presidencia</a></li>
           <li><a href="/administracion">Administración</a></li>
           <li><a href="/acomodadores">Acomodadores</a></li>

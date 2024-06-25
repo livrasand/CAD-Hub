@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingresar :: CAD Hub</title>
+    <title>Sitio oficial de CAD Hub: testigos de Jehová</title>
+    <meta name="description" content="Aplicación diseñada para los testigos de Jehová que trabajan en los Departamentos de Asambleas de Circuito.">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
     <style>
 
@@ -153,13 +154,13 @@ function convertirAMayusculas(input) {
                     </div>
                     <form action="/access" method="POST">
     <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Código de su asamblea:</span><br>
-    <input type="text" name="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" placeholder="ABCDE" oninput="convertirAMayusculas(this)" maxlength="5" required><br>
+    <input type="text" name="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" placeholder="ABCDE" oninput="convertirAMayusculas(this)" maxlength="6" required><br>
     <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Acceder</button>
 </form>
 
     <footer class="main-footer" style="text-align:center;margin-top: 1.5rem;align-items: center;">
           <p class="margin-bottom-05">Otras opciones:</p>
-          <a class="button" href="create">Crear una cuenta</a>
+          <a class="button" href="create">Crear una nueva cuenta</a>
           <a class="button" href="login">Administración</a>
           <a class="button" href="https://opencollective.com/kingdom-hall-attendant" target="_blank" style="background-color: #FFC700;border: 1px solid #B8860B;color: #4a3604;margin-top: 10px;width: auto;">Donar</a>
         </footer>

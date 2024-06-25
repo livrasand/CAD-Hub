@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión :: CAD Hub</title>
+    <title>Log In :: CAD Hub</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
+    <meta name="robots" content="noindex">
     <style>
 
         @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
@@ -121,21 +122,20 @@ button, input, optgroup, select, textarea {
         <img src="{{ url_for('static', filename='logo-app.png') }}" width="53px">
       </div>
       <div class="logo-text" style="word-break: break-word;word-wrap: break-word;overflow-wrap: break-word;display: block;">
-                        <div style="font-size: 15px;color: #65605e;letter-spacing: 1px;line-height: 1.15;font-weight: 500;">Testigos de Jehová</div>
-                        <div style="font-size: 19px;color: #65605e;letter-spacing: 1px;line-height: 1.15;font-weight: 800;">Departamentos de Asambleas de Circuito</div>
+                        <h1 style="margin-bottom: .5em;color: #373433;font-size: 30px;margin-top: 0.6em;font-weight: 500;line-height: 1.1;">Iniciar sesión</h1>
                     </div>
                 
   </header>
-  <h1 style="margin-bottom: .5em;color: #4a6da7;font-size: 30px;margin-top: 0.6em;font-weight: 700;line-height: 1.1;">Iniciar sesión</h1>
   <div id="emailIntroduction" class="groupMargin" style="margin-top: 1.5rem;margin-bottom: 1rem;">
-                        <p>Bienvenido al área de inicio de sesión de la administración de la asamblea asociada a tu cuenta. Por favor, inicia sesión para acceder a las herramientas y funciones de administración.</p>
+                        
 
                     </div>
-                    <form action="/login" method="POST">
-                    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Correo electrónico:</span><br>
-                    <input type="email" name="email" formcontrolname="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" required>
+                    <form id="loginForm" action="/accessing" method="POST">
+                    <span style="color: #373433;font-weight: 700;font-size: .875rem;">Correo electrónico:</span><br>
+                    <input type="email" name="email" formcontrolname="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="email" style="width:100%;" required>
+
                     <br>
-                    <span style="color: #615d5c;font-weight: 700;font-size: .875rem;">Contraseña:</span><br>
+                    <span style="color: #373433;font-weight: 700;font-size: .875rem;">Escriba su contraseña:</span><br>
                     <input type="password" name="password" formcontrolname="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="form.eventCode" style="width:100%;" required>
                     <br>
                     <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Iniciar sesión</button>
@@ -144,5 +144,14 @@ button, input, optgroup, select, textarea {
           <a class="button" href="/">Atrás</a>
         </footer>
     </div>
+     <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            // Captura el correo electrónico del usuario
+            var userEmail = document.getElementById('email').value;
+
+            // Almacena el correo electrónico en sessionStorage
+            sessionStorage.setItem('userEmail', userEmail);
+        });
+    </script>
 </body>
 </html>

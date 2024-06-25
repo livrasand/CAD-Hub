@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite a collaborator :: CAD Hub</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
+    <meta name="robots" content="noindex">
+    <style>
+
+        @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+
+         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f8f7;
+            line-height: 1.45;
+            font-size: 1rem;
+            color: #373433;
+            font-family: NotoSans;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: calc(496px + 2rem);
+            height: auto;
+            background-color: #ffffff; /* Color de fondo del recuadro */
+            border: solid 2.5px rgba(0,0,0,.05);
+            border-radius: 3px;
+            padding: 20px; /* Espacio interior del recuadro */
+            text-align: left; /* Alineación del texto */
+        }
+
+        .margin-right-1 {
+  margin-inline-end: 1rem !important;
+}
+
+.field__input[type="text"], .field__input[type="url"], .field__input[type="tel"], .field__input[type="number"], .field__input[type="color"], .field__input[type="email"], .field__input[type="search"] {
+  min-height: 44px;
+}
+.input-access {
+  width: 250px;
+}
+.field__input {
+  font-family: inherit;
+  outline: none;
+  border: solid 1px #d5d4d2;
+  border-radius: 0;
+  padding: .625rem;
+  vertical-align: middle;
+  box-sizing: border-box;
+  outline: solid 1px transparent;
+  transition-property: color,outline;
+  transition-duration: .2s;
+  transition-timing-function: ease-in-out;
+}
+input {
+  line-height: normal;
+}
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+    line-height: inherit;
+    font-family: inherit;
+  margin: 0;
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+elemento {
+}
+.button--primary {
+  background-color: #386195;
+  border: 1px solid #386195;
+  color: #f8f8f7;
+}
+.button {
+  text-align: center;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: .25px;
+  text-decoration: none;
+  box-sizing: border-box;
+  display: inline-block;
+  min-width: 4.5em;
+  min-height: 44px;
+  padding: .8125em 1em;
+  border-radius: 2px;
+  font-size: 1rem;
+  border: 1px solid #d5d4d2;
+  background-color: #f0f0ef;
+  color: #373433;
+}
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+button, select {
+  text-transform: none;
+}
+button {
+  overflow: visible;
+}
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  margin: 0;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="page__header grid grid--no-bleed grid--nowrap grid--cross-center margin-bottom-2" style="align-items: center;align-content: center;display: flex;">
+      <div class="margin-right-1">
+        <img src="{{ url_for('static', filename='logo-app.png') }}" width="53px">
+      </div>
+      <div class="logo-text" style="word-break: break-word;word-wrap: break-word;overflow-wrap: break-word;display: block;">
+                        <h1 style="margin-bottom: .5em;color: #373433;font-size: 30px;margin-top: 0.6em;font-weight: 500;line-height: 1.1;">Invita a un colaborador</h1>
+                    </div>
+                
+  </header>
+  <div id="emailIntroduction" class="groupMargin" style="margin-top: 1.5rem;margin-bottom: 1rem;">
+                        Agrega la dirección de correo electrónico y haz clic en Invitar. 
+                    </div>
+                   <form id="loginForm" action="/inviting" method="POST">
+    <span style="color: #373433;font-weight: 700;font-size: .875rem;">Correo electrónico:</span><br>
+    <input type="email" name="email" formcontrolname="eventCode" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="email" style="width:100%;" required>
+    <br>
+    <input type="hidden" name="userEmail" id="userEmail">  <!-- Agrega este campo oculto -->
+    <br>
+    <button class="button button--primary" type="submit" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">Invitar</button>
+</form>
+
+    <footer class="main-footer" style="text-align:left;margin-top: 1.5rem;align-items: center;width: 100%;">
+          <a class="button" onclick="history.back()">Volver atrás</a>
+        </footer>
+    </div>
+   <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        
+        if (sessionStorage.getItem('userEmail')) {
+            // Asigna el correo electrónico al campo oculto 'userEmail'
+            document.getElementById('userEmail').value = sessionStorage.getItem('userEmail');
+        } else {
+            // Si no se capturó el correo electrónico, muestra un mensaje de error
+            alert('No se ha capturado el correo electrónico del usuario.');
+            // Evita que el formulario se envíe
+            event.preventDefault();
+        }
+    });
+</script>
+
+
+
+</body>
+</html>
