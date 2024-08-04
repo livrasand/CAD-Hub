@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar asistencia :: CAD Hub</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-app.png') }}">
+    <meta name="robots" content="noindex">
+    <style>
+      :root {
+  --fbc-blue-60: #0060df;
+  --fbc-blue-70: #003eaa;
+  --fbc-gray-20: #ededf0;
+  --fbc-light-gray: #F0F0F4;
+  --fbc-white: #ffffff;
+  --fbc-transition: all .15s cubic-bezier(.07,.95,0,1);
+  --fbc-borders: 1px solid #ededf0;
+  --fbc-primary-text: #15141A;
+  --fbc-secondary-text: #5B5B66;
+  --fbc-font-size: 13px;
+}
+
+        @font-face { font-family: NotoSans; src: url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff2") format("woff2"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.woff") format("woff"), url("https://b.jw-cdn.org/fonts/noto-sans/2.005-7697007/hinted/NotoSans-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: block;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffffff;
+            line-height: 1.45;
+            font-size: 1rem;
+            color: #373433;
+            font-family: NotoSans;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: calc(496px + 2rem);
+            height: auto;
+            background-color: #ffffff; /* Color de fondo del recuadro */
+            border: solid 2.5px rgba(0,0,0,.05);
+            border-radius: 3px;
+            padding: 20px; /* Espacio interior del recuadro */
+            text-align: left; /* Alineación del texto */
+        }
+
+        .margin-right-1 {
+  margin-inline-end: 1rem !important;
+}
+
+.field__input[type="text"], .field__input[type="url"], .field__input[type="tel"], .field__input[type="number"], .field__input[type="color"], .field__input[type="email"], .field__input[type="search"] {
+  min-height: 44px;
+}
+.input-access {
+  width: 250px;
+}
+.field__input {
+  font-family: inherit;
+  outline: none;
+  border: solid 1px #d5d4d2;
+  border-radius: 0;
+  padding: .625rem;
+  vertical-align: middle;
+  box-sizing: border-box;
+  outline: solid 1px transparent;
+  transition-property: color,outline;
+  transition-duration: .2s;
+  transition-timing-function: ease-in-out;
+}
+input {
+  line-height: normal;
+}
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+    line-height: inherit;
+    font-family: inherit;
+  margin: 0;
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+elemento {
+}
+.button--primary {
+  background-color: #386195;
+  border: 1px solid #386195;
+  color: #f8f8f7;
+}
+.button {
+  text-align: center;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: .25px;
+  text-decoration: none;
+  box-sizing: border-box;
+  display: inline-block;
+  min-width: 4.5em;
+  min-height: 44px;
+  padding: .8125em 1em;
+  border-radius: 2px;
+  font-size: 1rem;
+  border: 1px solid #d5d4d2;
+  background-color: #f0f0ef;
+  color: #373433;
+}
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+button, select {
+  text-transform: none;
+}
+button {
+  overflow: visible;
+}
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  margin: 0;
+}
+
+a:visited {
+  color: #4171ae;
+}
+a, a:link {
+  text-decoration: none;
+  color: #4171ae;
+  cursor: pointer;
+}
+
+
+a {
+  color: #4171ae;
+  text-decoration: none;
+  line-height: inherit;
+}
+a {
+  background-color: transparent;
+}
+
+@media (min-width: 768px) {
+  .page__prefix-heading {
+    font-size: 1rem;
+  }
+}
+.page__prefix-heading {
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: block;
+  font-weight: 400;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: .025rem;
+  color: var(--color-gray-600);
+  font-size: 1rem;
+}
+.grid--cross-center {
+  align-items: center;
+  align-content: center;
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.grid--shrink > .grid__item {
+  flex-grow: 0;
+}
+.grid__item {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+    flex-grow: 1;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.page__heading--has-prefix-heading {
+  margin-top: 0;
+}
+@media (min-width: 768px) {
+  .page__heading--title {
+    font-size: 1.938rem;
+  }
+}
+.page__heading--title {
+  font-size: 1.625rem;
+}
+.page__heading, .filters-v2__active-filters-heading {
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: block;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #222020;
+}
+.data__label, .card__text-label {
+  box-sizing: border-box;
+  color: #74706d;
+  font-size: .875rem;
+  font-weight: 400;
+}
+.data--gutter-v2 .data__value {
+  margin-bottom: 1rem;
+}
+.data__value {
+  box-sizing: border-box;
+}
+
+.field__label {
+  color: #615d5c;
+  font-weight: 700;
+  display: block;
+  font-size: .875rem;
+  margin-bottom: 4px;
+  outline: solid 1px transparent;
+  transition-property: color,outline;
+  transition-duration: .2s;
+  transition-timing-function: ease-in-out;
+}
+
+.field__label {
+  color: #615d5c;
+  font-weight: 700;
+  font-size: .875rem;
+}
+
+.field__optional-text {
+  color: #615d5c;
+  font-weight: 400;
+}
+
+.field__textarea {
+  font-family: inherit;
+  outline: none;
+  border: solid 1px #d5d4d2;
+  border-radius: 0;
+  padding: .625rem;
+  vertical-align: middle;
+  box-sizing: border-box;
+  outline: solid 1px transparent;
+  transition-property: color,outline;
+  transition-duration: .2s;
+  transition-timing-function: ease-in-out;
+  height: auto;
+  min-height: 48px;
+  max-height: 80vh;
+  width: 100%;
+  resize: vertical;
+}
+
+.ptrn-modal-dialog__header {
+  display: block;
+  border-radius: 2px 2px 0 0;
+  background-color: #f0f0ef;
+  position: relative;
+  z-index: 1;
+}
+.ptrn-modal-dialog__header-wrapper {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+}
+.ptrn-modal-dialog__heading-wrapper {
+  flex: 1;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .ptrn-modal-dialog__heading {
+    font-size: 1rem;
+  }
+}
+.ptrn-modal-dialog__heading {
+  font-size: 1rem;
+  padding: 0;
+  margin: 0;
+}
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+.ptrn-modal-dialog__header .ptrn-modal-dialog__close {
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  line-height: .5;
+}
+ptrn-icon {
+  display: inline-flex;
+}
+.ptrn-modal-dialog__header .ptrn-modal-dialog__close {
+  line-height: .5;
+}
+.icon {
+  display: inline-flex;
+}
+.ptrn-modal-dialog__close-icon {
+  float: right;
+}
+.g700 {
+  color: #615d5c !important;
+}
+.icon__body:not(.icon__body--stroke-only) {
+  fill: currentColor;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+.icon__body--stroke {
+  stroke: currentColor;
+}
+.icon__body {
+  fill: none;
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #161616;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Adjust to position the tooltip above the element */
+    left: 50%;
+    margin-left: -70px; /* Adjust to center the tooltip */
+    opacity: 0;
+    transition: opacity 0.4s;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Adjust to position the arrow at the bottom */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #161616 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+.tooltip .icon {
+    transition: fill 0.4s;
+}
+
+.tooltip:hover .icon {
+    fill: rgba(255, 255, 255, 0.5); /* Adjust this to the desired tint */
+}
+    </style>
+    <script type="text/javascript">
+        function mostrarModal() {
+            document.getElementById('modal').style.display = 'block';
+        }
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+  <nav class="top-nav" style="width: 100%;-webkit-box-flex: 0;-ms-flex: none;flex: none;display: -webkit-box;display: -ms-flexbox;display: flex;-webkit-box-pack: justify;-ms-flex-pack: justify;justify-content: space-between;-webkit-box-sizing: border-box;box-sizing: border-box;width: 100%;max-width: 100%;height: 48px;background-color: #103245;color: #f0f0ef;align-items: right;">
+    <img src="{{ url_for('static', filename='logo-app.png') }}" width="53px">
+    <section class="top-nav__secondary-items-container" style="-webkit-box-pack: end;-ms-flex-pack: end;justify-content: flex-end;-ms-flex-item-align: center;align-self: center;display: -webkit-box;display: -ms-flexbox;display: flex;-ms-flex-item-align: stretch;align-self: stretch;margin-right: 0;">
+                  <p class="top-nav__secondary-items" style="-ms-flex-negative: 0;
+  flex-shrink: 0;-webkit-box-pack: end;-ms-flex-pack: end;justify-content: flex-end;-ms-flex-item-align: center;align-self: center;padding-right: 0.5rem;">
+                     <a class="top-nav__link top-nav__link--login" href="/" style="color: #dee7f1;font-size: 0.8rem;padding-left: 0.8rem;padding-right: 0.8rem;">SALIR</a>
+                  </p>
+               </section>
+  </nav>
+  <ptrn-breadcrumb class="ng-star-inserted"><nav aria-labelledby="page-breadcrumb" ptrnaction="" class="breadcrumb" style="background-color: #e7e6e4;"><a class="breadcrumb__breadcrumb-link ng-star-inserted" onclick="window.history.back()" style="padding-inline-start: calc(1.5rem - 14px);padding: .5rem 0;padding-inline-start: 1rem;text-decoration: none;color: #386195;display: flex;align-items: center;font-size: .875rem;"><ptrn-icon aria-hidden="true" cssclass="breadcrumb__breadcrumb-icon" icon="chevron-left" class="ng-star-inserted" style="display: inline-flex;"><span class="icon breadcrumb__breadcrumb-icon"><svg class="icon__body--flip-rtl icon__body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="14" width="14"><g><path d="M15.191,23.588l-8-11c-0.255-0.351-0.255-0.825,0-1.176l8-11l1.617,1.176L9.236,12l7.572,10.412 L15.191,23.588z"></path></g></svg></span></ptrn-icon><span id="page-breadcrumb" class="ng-star-inserted" style="font-size: .875rem;margin-top: -3px;">Inicio</span><!----></a><!----><!----><!----><!----></nav></ptrn-breadcrumb>
+</body>
+  <main style="margin-right: 10%;margin-left: 10%;">
+
+   <input type="hidden" name="departamento" value="{{ table }}">
+{% if "_ADMIN" not in request.path %}
+    <app-default-header><header class="page-header"><p class="page__prefix-heading ng-star-inserted"> {{ departamento }} </p><!----><div class="grid grid--shrink grid--cross-center"><div class="grid__item"><h1 class="page__heading page__heading--title page__heading--has-prefix-heading ng-star-inserted"> Enviar asistencia </h1><!----><!----></div><div class="grid__item margin-bottom-1"><!----></div></div><!----></header><!----></app-default-header>
+ {% else %}
+    <app-default-header><header class="page-header"><p class="page__prefix-heading ng-star-inserted"> {{ departamento }} </p><!----><div class="grid grid--shrink grid--cross-center"><div class="grid__item"><h1 class="page__heading page__heading--title page__heading--has-prefix-heading ng-star-inserted">Asistencia recibida: {{ total_asistencia }}</h1><!----><!----></div><div class="grid__item margin-bottom-1"><!----></div></div><!----></header><!----></app-default-header>
+ {% endif %}
+<app-data-event-period><dt ptrntranslate="" class="page__text-block">Seleccione su sección:</dt><!----><!----><!----></app-data-event-period>
+    
+{% for section in secciones %}
+            <button class="button button--primary" onclick="window.location.href='{{ url_for('ver_seccion', id_seccion=section[0]) }}'" style="background-color: #6b94c7; border: none; color: #fff; margin: 5px; position: relative; height: 3em; min-height: 48px; min-width: 48px; margin-bottom: 2px; border-radius: 0; font-size: 16px;">
+              {% if "_ADMIN" not in request.path %}
+
+{% else %}
+              <a href="{{ url_for('eliminar_seccion', id_seccion=section[0]) }}" class="tooltip" style="position: absolute; top: 2px; right: 2px; background: none; border: none; cursor: pointer; color: #fff;">
+    <svg class="icon w-64 h-64" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M0 0h24v24H0V0z" fill="none"></path>
+        <path d="M8 9h8v10H8z" opacity=".3"></path>
+        <path d="M15.5 4l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9z"></path>
+    </svg>
+    <span class="tooltiptext">Eliminar sección</span>
+</a>
+{% endif %}
+{{ section[0] }}
+            </button>
+            {% endfor %}
+<br><br>
+{% if "_ADMIN" not in request.path %}
+
+{% else %}
+<div class="secciones-container">
+        <section class="page page--large">
+
+            <!-- Botón para abrir el modal -->
+            <button onclick="mostrarModal()" class="button button--primary" style="background-color: #f0f0ef; border: 1px solid #d5d4d2; color: #373433; position: relative; height: 3em; min-height: 48px; min-width: 48px; margin-bottom: 2px; border-radius: 0; font-size: 16px;">
+                Crear nueva sección
+            </button>
+
+
+            <!-- Modal para crear nueva sección -->
+            <div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4);">
+                <div style="background:#fff; padding:20px; position:relative;inset-inline-start: 50%;top: 50%;transform: translate(-50%,-50%);height: auto;max-height: calc(100% - 4rem);min-width: 400px;max-width: calc(50vw - 16rem);border-radius: 2px;">
+                  <ptrn-modal-header class="ng-tns-c2449824817-2 ptrn-modal-dialog__header" id="ptrn-modal-0" tabindex="-1" style="margin: -20px;"><header><div class="ptrn-modal-dialog__header-wrapper"><div class="ptrn-modal-dialog__heading-wrapper"><h2 class="ptrn-modal-dialog__heading ng-star-inserted">Crear nueva sección</h2><!----><!----></div><button type="button" onclick="cerrarModal()" class="ptrn-modal-dialog__close ng-star-inserted" aria-label="Cerrar"><ptrn-icon icon="close" cssclass="ptrn-modal-dialog__close-icon g700"><span class="icon ptrn-modal-dialog__close-icon g700"><svg class="icon__body--stroke icon__body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><g stroke-linecap="square" stroke-linejoin="miter" stroke-width="2"><line fill="none" stroke-miterlimit="10" x1="19" y1="5" x2="5" y2="19"></line> <line fill="none" stroke-miterlimit="10" x1="19" y1="19" x2="5" y2="5"></line></g></svg></span></ptrn-icon></button><!----></div></header></ptrn-modal-header>
+                    <h1 class="page__heading page__heading--title page__heading--has-prefix-heading ng-star-inserted"></h1>
+                    <form method="POST" action="/secciones">
+                        <p class="page__text-blockQ" for="nombre_seccion" style="margin-top: 30px;margin-bottom: -20px;">Nombre de la sección:</p><br>
+                    <input type="text" name="nombre_seccion" autocorrect="off" autocapitalize="none" spellcheck="false" class="field__input input-access ng-pristine ng-invalid ng-star-inserted ng-touched" autocomplete="off" id="nombre_seccion" style="width:100%;" required>
+                        <button type="submit" class="button button--primary" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">
+                            Crear
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        
+        </section>
+    </div>
+    {% endif %}
+
+    <br><br>
+  </div>
+</main>
+</html>

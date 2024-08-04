@@ -11,7 +11,6 @@ import datetime
 import string
 import uuid  
 
-
 app = Flask(__name__)
 app.secret_key = '14b9856a0a051c5e80e072f4de6dfe306f913c3ea5c946f1'
 
@@ -70,11 +69,21 @@ def verify_credentials(email, password):
     return user is not None
 
 def delete_user(email):
+    db_name = f'{email.split("@")[0]}-cadhub.db'
+
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM users WHERE email = ?", (email,))
     conn.commit()
     conn.close()
+
+    try:
+        os.remove(db_name)
+        flash(f'La base de datos {db_name} ha sido eliminada.')
+    except FileNotFoundError:
+        flash(f'Error: la base de datos {db_name} no se encontró.')
+    except Exception as e:
+        flash(f'Error al eliminar la base de datos: {str(e)}')
 
 @app.route('/email_invitation')
 def email_invitation():
@@ -805,6 +814,140 @@ def agua_purificada():
         print("Base de datos no especificada")
         return render_template('detail-cad.html', error="Base de datos no especificada.")
 
+@app.route('/asistencia')
+@app.route('/asistencia_ADMIN')
+def asistencia():
+    global current_database
+
+    departamento = "Asistencia"
+    table = "sections"
+
+    if request.path.endswith("_ADMIN"):
+        departamento = "Asistencia"
+        table = "sections"
+
+    fecha_actual = datetime.datetime.now().strftime("%d de %B de %Y")
+
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
+
+            cursor.execute(f"SELECT * FROM {table}")
+            secciones = cursor.fetchall()
+
+            cursor.execute(f"SELECT SUM(attendance) FROM {table}")
+            total_asistencia = cursor.fetchone()[0] or 0  # Si es None, usar 0
+
+            print("Base de datos en Asistencia:", current_database)
+
+            return render_template('detail-attendance.html', users=None, departamento=departamento, secciones=secciones, fecha_actual=fecha_actual, table=table, total_asistencia=total_asistencia)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-attendance.html', error="Error al conectar con la base de datos específica.")
+    else:
+        print("Base de datos no especificada")
+        return render_template('detail-attendance.html', error="Base de datos no especificada.")
+
+@app.route('/secciones', methods=['POST'])
+def crear_seccion():
+    if request.method == 'POST':
+        nombre_seccion = request.form['nombre_seccion']
+        
+        # Verifica si la base de datos está especificada
+        if current_database:
+            try:
+                # Establecer una conexión a la base de datos especificada
+                new_db = sqlite3.connect(current_database)
+                cursor = new_db.cursor()
+                
+                # Insertar la nueva sección en la base de datos
+                cursor.execute("INSERT INTO sections (name) VALUES (?)", (nombre_seccion,))
+                new_db.commit()
+                
+                # Cerrar la conexión
+                cursor.close()
+                new_db.close()
+                
+                # Redirigir de vuelta a la página principal
+                return redirect(url_for('asistencia'))
+            except sqlite3.Error as e:
+                print(f"Error al conectar con la base de datos específica: {e}")
+                return render_template('detail-attendance.html', error="Error al conectar con la base de datos específica.")
+        else:
+            print("Base de datos no especificada")
+            return render_template('detail-attendance.html', error="Base de datos no especificada.")
+
+@app.route('/eliminar_seccion/<string:id_seccion>', methods=['GET'])
+def eliminar_seccion(id_seccion):
+    global current_database
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
+            
+            # Eliminar la sección de la base de datos
+            cursor.execute("DELETE FROM sections WHERE name = ?", (id_seccion,))
+            new_db.commit()
+            
+            # Cerrar la conexión
+            cursor.close()
+            new_db.close()
+            
+            # Redirigir de vuelta a la página principal
+            return redirect(url_for('asistencia'))
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-attendance.html', error="Error al conectar con la base de datos específica.")
+    else:
+        print("Base de datos no especificada")
+        return render_template('detail-attendance.html', error="Base de datos no especificada.")
+
+@app.route('/ver_seccion/<string:id_seccion>')
+def ver_seccion(id_seccion):
+    global current_database
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
+
+            cursor.execute("SELECT * FROM sections WHERE name = ?", (id_seccion,))
+            asistentes = cursor.fetchone()
+
+            print("Base de datos de Asistentes:", current_database)
+
+            return render_template('attendance.html', asistentes=asistentes, id_seccion=id_seccion)
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('attendance.html', error="Error al conectar con la base de datos específica.")
+    else:
+        print("Base de datos no especificada")
+        return render_template('attendance.html', error="Base de datos no especificada.")
+
+@app.route('/guardar_asistencia', methods=['POST'])
+def guardar_asistencia():
+    id_seccion = request.form.get('id_seccion')
+    attendance = request.form.get('attendance')
+    
+    if not id_seccion or not attendance:
+        return "Error: Missing section ID or attendance number", 400
+    
+    try:
+        new_db = sqlite3.connect(current_database)
+        cursor = new_db.cursor()
+        
+        cursor.execute("UPDATE sections SET attendance = ? WHERE name = ?", (attendance, id_seccion))
+        new_db.commit()
+        
+        return redirect(url_for('ver_seccion', id_seccion=id_seccion))
+    except sqlite3.Error as e:
+        print(f"Error al actualizar la base de datos: {e}")
+        return "Error al actualizar la base de datos", 500
+    finally:
+        new_db.close()
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -942,6 +1085,36 @@ def guardar_codigo_evento(usuario_correo, nuevo_codigo):
     conn_principal.commit()
     conn_principal.close()
 
+@app.route('/eliminar_evento/<codigo>', methods=['GET'])
+def eliminar_evento(codigo):
+    if not codigo:
+        flash('Código de evento no proporcionado.')
+        return redirect(url_for('home'))
+
+    try:
+        eliminar_codigo_evento(codigo)
+        eliminar_base_datos_evento(codigo)
+        flash('Evento eliminado exitosamente.')
+        return redirect(request.referrer or url_for('home'))
+    except Exception as e:
+        flash(f'Error al eliminar el evento: {str(e)}')
+        return redirect(request.referrer or url_for('home'))
+
+def eliminar_codigo_evento(codigo):
+    conn_principal = sqlite3.connect('cad.db')
+    cursor_principal = conn_principal.cursor()
+    cursor_principal.execute("DELETE FROM events_codes WHERE code = ?", (codigo,))
+    conn_principal.commit()
+    conn_principal.close()
+
+def eliminar_base_datos_evento(codigo):
+    db_name = f"{codigo}.db"
+    try:
+        os.remove(db_name)
+    except FileNotFoundError:
+        raise Exception(f'Error: la base de datos {db_name} no se encontró.')
+    except Exception as e:
+        raise Exception(f'Error al eliminar la base de datos: {str(e)}')
 
 def crear_nueva_base_datos(nombre_codigo):
     # Copiar la estructura de la base de datos cad_hub_base.db a una nueva base de datos con el nombre del código
@@ -988,6 +1161,7 @@ def ver_informes():
     else:
         print("No se recibió el código del evento.")
         return render_template('cad_admin_select.html', users=users)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

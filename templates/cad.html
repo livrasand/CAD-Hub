@@ -358,6 +358,88 @@ p {
 .margin-0 {
   margin: 0 0 !important;
 }
+@media only screen and (min-width: 37.5em) {
+  .card-donate {
+    padding: 1rem;
+  }
+}
+.card-donate {
+  padding: 2rem 1rem;
+  border: solid 1px rgba(0,0,0,.05);
+}
+.card {
+  border: solid 1px rgba(0,0,0,.05);
+  border-radius: 3px;
+  background-color: #fff;
+  margin: 0;
+    margin-bottom: 0px;
+  padding: 20px;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+@media (min-width: 600px) {
+  .margin-bottom-2\@small-up {
+    margin-bottom: 1.5rem !important;
+  }
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+@media (min-width: 48rem) {
+  .text-x-large\@medium-up {
+    font-size: 1.438rem;
+    line-height: inherit;
+  }
+}
+.text-large {
+  font-size: 1.188rem;
+  line-height: inherit;
+}
+@media only screen and (min-width: 48em) {
+  h3 {
+    font-size: 1.4375rem;
+  }
+}
+@media only screen and (min-width: 48em) {
+  h1, h2, h3, h4, h5, h6 {
+    line-height: inherit;
+  }
+}
+h3 {
+  font-size: 1.125rem;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: inherit;
+  font-weight: normal;
+  font-style: normal;
+  color: #615d5c;
+  text-rendering: auto;
+  margin-top: .2rem;
+  margin-bottom: .5rem;
+  line-height: inherit;
+}
+div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, th, td {
+  margin: 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  padding: 0;
+}
+.icon.icon--link-color {
+  fill: #497bbb;
+}
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.button:hover {
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.37);
+  background-color: #c0c0bf;
+    
+}
     </style>
 </head>
 <body>
@@ -372,15 +454,21 @@ p {
   </nav>
 </body>
   <main style="margin-right: 10%;margin-left: 10%;">
-    <h2 style="font-size: 1.75rem;font-weight: normal;margin-top: 0;margin-bottom: .5em;color: #615d5c;margin-top: 2rem">¡Bienvenido!</h2>
-
-
+    <h2 style="font-size: 1.75rem;font-weight: normal;margin-top: 0;margin-bottom: .5em;color: #615d5c;margin-top: 2rem">¡Bienvenido a su asamblea!</h2>
 
     <div class="grid grid--main-between grid--no-bleed ">
          <article class="notification box box--shaded-light grid__item grid__item--7@medium-up" style="-webkit-box-flex: 0;-ms-flex: 0 0 43.75%;flex: 0 0 43.75%;width:43.75%;min-width: 300px;background-color: #f8f8f7;border: 1px solid #e7e6e4;padding: 10px;margin: 0 0 20px;"><section class="notification__content grid__item grid__item--cross-start"><h3 style="color: #615d5c;font-size: 1.25rem;font-weight: 400;margin-bottom: .5em;">Departamentos:</h3><ul>
           <li><a href="/presidencia">Presidencia</a></li>
           <li><a href="/administracion">Administración</a></li>
           <li><a href="/acomodadores">Acomodadores</a></li>
+          <ul style="list-style: none; padding-left: 20px;">
+            <li style="position: relative; padding-left: .9em;">
+              <a href="/asistencia" style="text-decoration: none;">
+                Asistencia
+              </a>
+              <span style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 4px; border: 1px solid #615d5c; border-radius: 50%;"></span>
+            </li>
+          </ul>
           <li><a href="/instalacion">Instalación</a></li>
           <li><a href="/bautismo">Bautismo</a></li>
           <li><a href="/primeros_auxilios">Primeros auxilios</a></li>
@@ -395,6 +483,36 @@ p {
       </div>
 
     <br><br>
+
+    <article class="card card-donate margin-bottom-2@small-up ng-scope">
+         <getting-help class="ng-isolate-scope"><h3 class="text-large text-x-large@medium-up" style="font-size: 1.438rem;  margin-top: .2rem;margin-bottom: .5rem;">Obtener ayuda</h3>
+<p>
+   Descargue las "Instrucciones para el uso de CAD Hub para acomodadores" para obtener directrices detalladas sobre cómo desempeñar su asignación en esta asamblea usando CAD Hub. Si usted es Superintendente de departamento o auxiliar, por favor descargue las "Instrucciones para el uso de CAD Hub para departamentos". Estas guías le proporcionarán la información necesaria para cumplir con su privilegio de manera eficaz y ordenada. Estas instrucciones deben ser accesibles únicamente a los hermanos designados para dichas responsabilidades.
+</p>
+<br>
+<button class="button button--primary" style="font-size: 1rem;border: 1px solid #d5d4d2;color: #373433;transition: background-color .25s ease-out,box-shadow .28s,-webkit-box-shadow .28s;vertical-align: middle;letter-spacing: .25px;min-width: 4.5em;">
+                <jwo-icon icon="download" size="20" class="icon--link-color ng-scope ng-isolate-scope"><span class="icon--link-color icon">
+   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+      <g>
+         <path d="M19.872,10.076C19.189,6.045,15.666,3,11.5,3c-4.304,0-7.877,3.196-8.419,7.396C1.236,11.161,0,12.963,0,15 c0,2.757,2.243,5,5,5h14c2.757,0,5-2.243,5-5C24,12.54,22.215,10.49,19.872,10.076z M12,17l-5-5h4V8h2v4h4L12,17z"></path>
+      </g>
+   </svg>
+</span></jwo-icon>
+Instrucciones para el uso de CAD Hub para acomodadores
+            </button>
+            <button class="button button--primary" style="font-size: 1rem;border: 1px solid #d5d4d2;color: #373433;transition: background-color .25s ease-out,box-shadow .28s,-webkit-box-shadow .28s;vertical-align: middle;letter-spacing: .25px;min-width: 4.5em;">
+                <jwo-icon icon="download" size="20" class="icon--link-color ng-scope ng-isolate-scope"><span class="icon--link-color icon">
+   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+      <g>
+         <path d="M19.872,10.076C19.189,6.045,15.666,3,11.5,3c-4.304,0-7.877,3.196-8.419,7.396C1.236,11.161,0,12.963,0,15 c0,2.757,2.243,5,5,5h14c2.757,0,5-2.243,5-5C24,12.54,22.215,10.49,19.872,10.076z M12,17l-5-5h4V8h2v4h4L12,17z"></path>
+      </g>
+   </svg>
+</span></jwo-icon>
+Instrucciones para el uso de CAD Hub para departamentos
+            </button>
+
+</getting-help>
+      </article>
   </div>
 </main>
 </html>
