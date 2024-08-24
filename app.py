@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, g, flash, session
+from flask import Flask, render_template, request, redirect, url_for, g, flash, session, Response
 import sqlite3
 from datetime import datetime
 import secrets
@@ -10,6 +10,10 @@ import random
 import datetime
 import string
 import uuid  
+import json
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = '14b9856a0a051c5e80e072f4de6dfe306f913c3ea5c946f1'
@@ -949,6 +953,105 @@ def guardar_asistencia():
     finally:
         new_db.close()
 
+@app.route('/restablecer_valores', methods=['GET'])
+def restablecer_valores():
+    global current_database
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
+            
+            # Restablecer el campo attendance en todas las filas de la tabla sections
+            cursor.execute("UPDATE sections SET attendance = ''")
+            new_db.commit()
+            
+            # Cerrar la conexión
+            cursor.close()
+            new_db.close()
+            
+            # Redirigir de vuelta a la página principal
+            return redirect(url_for('asistencia'))
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-attendance.html', error="Error al conectar con la base de datos específica.")
+    else:
+        print("Base de datos no especificada")
+        return render_template('detail-attendance.html', error="Base de datos no especificada.")
+
+@app.route('/exportar_datos', methods=['POST'])
+def exportar_datos():
+    global current_database
+    formato = request.form['formato']
+    
+    if current_database:
+        try:
+            # Establecer una conexión a la base de datos especificada
+            new_db = sqlite3.connect(current_database)
+            cursor = new_db.cursor()
+            
+            # Obtener todos los datos de la tabla sections
+            cursor.execute("SELECT * FROM sections")
+            datos = cursor.fetchall()
+            cursor.execute("SELECT SUM(attendance) FROM sections")
+            total_asistencia = cursor.fetchone()[0] or 0
+            cursor.close()
+            new_db.close()
+            
+            # Convertir los datos a un formato legible
+            datos_legibles = []
+            for fila in datos:
+                # Asumiendo que las columnas son (name, id, attendance)
+                name, id, attendance = fila
+                datos_legibles.append(f"{name}: {attendance}")
+            
+            if formato == 'json':
+                # Convertir a JSON
+                datos_json = json.dumps(datos_legibles)
+                return Response(datos_json, mimetype='application/json', headers={'Content-Disposition': 'attachment;filename=datos.json'})
+            elif formato == 'texto_plano':
+                # Convertir a texto plano
+                datos_texto_plano = "\n".join(datos_legibles)
+                return Response(datos_texto_plano, mimetype='text/plain', headers={'Content-Disposition': 'attachment;filename=datos.txt'})
+            elif formato == 'pdf':
+                # Crear un PDF
+                buffer = BytesIO()
+                p = canvas.Canvas(buffer, pagesize=letter)
+                width, height = letter
+                
+                # Agregar el encabezado con el logo y nombre de la app
+                logo_path = os.path.join(os.path.dirname(__file__), 'static', 'logo-app.png')
+                p.drawImage(logo_path, 40, height - 60, width=50, height=50)  # Ajusta la posición y tamaño del logo según necesites
+                p.setFont("Helvetica-Bold", 16)
+                p.drawString(100, height - 40, "CAD Hub")
+                
+                # Agregar los datos
+                p.setFont("Helvetica", 12)
+                y_position = height - 100
+                for linea in datos_legibles:
+                    p.drawString(40, y_position, linea)
+                    y_position -= 15
+                    if y_position < 40:
+                        p.showPage()
+                        y_position = height - 40
+
+                # Agregar el total de asistencia en negritas
+                p.setFont("Helvetica-Bold", 14)
+                total_asistencia_str = f"Total de asistencia: {total_asistencia}"
+                p.drawString(40, y_position - 40, total_asistencia_str)
+                
+                p.save()
+                buffer.seek(0)
+                return Response(buffer, mimetype='application/pdf', headers={'Content-Disposition': 'attachment;filename=datos.pdf'})
+            else:
+                return render_template('detail-attendance.html', error="Formato de exportación no válido.")
+        except sqlite3.Error as e:
+            print(f"Error al conectar con la base de datos específica: {e}")
+            return render_template('detail-attendance.html', error="Error al conectar con la base de datos específica.")
+    else:
+        print("Base de datos no especificada")
+        return render_template('detail-attendance.html', error="Base de datos no especificada.")
+        
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)

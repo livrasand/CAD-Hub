@@ -379,6 +379,13 @@ svg:not(:root) {
         function cerrarModal() {
             document.getElementById('modal').style.display = 'none';
         }
+        function abrirExportModal() {
+    document.getElementById('exportModal').style.display = 'block';
+}
+
+function cerrarExportModal() {
+    document.getElementById('exportModal').style.display = 'none';
+}
     </script>
 </head>
 <body>
@@ -428,8 +435,14 @@ svg:not(:root) {
         <section class="page page--large">
 
             <!-- Botón para abrir el modal -->
-            <button onclick="mostrarModal()" class="button button--primary" style="background-color: #f0f0ef; border: 1px solid #d5d4d2; color: #373433; position: relative; height: 3em; min-height: 48px; min-width: 48px; margin-bottom: 2px; border-radius: 0; font-size: 16px;">
+            <button onclick="mostrarModal()" class="button button--primary" style="background-color: #f0f0ef; border: 1px solid #d5d4d2; color: #373433; position: relative; margin-bottom: 2px; border-radius: 0; font-size: 16px;">
                 Crear nueva sección
+            </button>
+            <button onclick="location.href='/restablecer_valores'" class="button button--primary" style="background-color: #e53243;border: 1px solid #ac1624;color: #f8f8f7;">
+                Restablecer valores
+            </button>
+            <button onclick="abrirExportModal()" class="button button--primary" style="background-color: #f0f0ef; border: 1px solid #d5d4d2; color: #373433; position: relative; margin-bottom: 2px; border-radius: 0; font-size: 16px;">
+                Exportar datos
             </button>
 
 
@@ -447,6 +460,46 @@ svg:not(:root) {
                     </form>
                 </div>
             </div>
+
+            <!-- Modal de Selección de Formato -->
+<div id="exportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4);">
+    <div style="background:#fff; padding:20px; position:relative;inset-inline-start: 50%;top: 50%;transform: translate(-50%,-50%);height: auto;max-height: calc(100% - 4rem);min-width: 400px;max-width: calc(50vw - 16rem);border-radius: 2px;">
+        <ptrn-modal-header class="ng-tns-c2449824817-2 ptrn-modal-dialog__header" id="ptrn-modal-0" tabindex="-1" style="margin: -20px;">
+            <header>
+                <div class="ptrn-modal-dialog__header-wrapper">
+                    <div class="ptrn-modal-dialog__heading-wrapper">
+                        <h2 class="ptrn-modal-dialog__heading ng-star-inserted">Exportar datos</h2>
+                    </div>
+                    <button type="button" onclick="cerrarExportModal()" class="ptrn-modal-dialog__close ng-star-inserted" aria-label="Cerrar">
+                        <ptrn-icon icon="close" cssclass="ptrn-modal-dialog__close-icon g700">
+                            <span class="icon ptrn-modal-dialog__close-icon g700">
+                                <svg class="icon__body--stroke icon__body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+                                    <g stroke-linecap="square" stroke-linejoin="miter" stroke-width="2">
+                                        <line fill="none" stroke-miterlimit="10" x1="19" y1="5" x2="5" y2="19"></line>
+                                        <line fill="none" stroke-miterlimit="10" x1="19" y1="19" x2="5" y2="5"></line>
+                                    </g>
+                                </svg>
+                            </span>
+                        </ptrn-icon>
+                    </button>
+                </div>
+            </header>
+        </ptrn-modal-header>
+        <h1 class="page__heading page__heading--title page__heading--has-prefix-heading ng-star-inserted"></h1>
+        <form method="POST" action="/exportar_datos">
+            <p class="page__text-blockQ" style="margin-top: 30px;margin-bottom: -20px;">Seleccione el formato de exportación:</p><br>
+            <input type="radio" id="pdf" name="formato" value="pdf" required>
+            <label for="pdf">PDF</label><br>
+            <input type="radio" id="json" name="formato" value="json" required>
+            <label for="json">JSON</label><br>
+            <input type="radio" id="texto_plano" name="formato" value="texto_plano" required>
+            <label for="texto_plano">Texto plano</label><br><br>
+            <button type="submit" class="button button--primary" style="background-color: #386195;border: 1px solid #386195;color: #f8f8f7;margin-top: 10px;width: 100%;">
+                Exportar
+            </button>
+        </form>
+    </div>
+</div>
 
         
         </section>

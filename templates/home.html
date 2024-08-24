@@ -338,7 +338,210 @@ button, input, optgroup, textarea {
     line-height: inherit;
   margin: 0;
 }
+a:visited {
+  color: #4171ae;
+}
+a, a:link {
+  text-decoration: none;
+  color: #4171ae;
+  cursor: pointer;
+}
+
+
+a {
+  color: #4171ae;
+  text-decoration: none;
+  line-height: inherit;
+}
+a {
+  background-color: transparent;
+}
+
+@media (min-width: 768px) {
+  .page__prefix-heading {
+    font-size: 1rem;
+  }
+}
+.page__prefix-heading {
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: block;
+  font-weight: 400;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: .025rem;
+  color: var(--color-gray-600);
+  font-size: 1rem;
+}
+.grid--cross-center {
+  align-items: center;
+  align-content: center;
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.grid--shrink > .grid__item {
+  flex-grow: 0;
+}
+.grid__item {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+    flex-grow: 1;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.page__heading--has-prefix-heading {
+  margin-top: 0;
+}
+@media (min-width: 768px) {
+  .page__heading--title {
+    font-size: 1.938rem;
+  }
+}
+.page__heading--title {
+  font-size: 1.625rem;
+}
+.page__heading, .filters-v2__active-filters-heading {
+  word-break: break-word;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  display: block;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #222020;
+}
+.data__label, .card__text-label {
+  box-sizing: border-box;
+  color: #74706d;
+  font-size: .875rem;
+  font-weight: 400;
+}
+.data--gutter-v2 .data__value {
+  margin-bottom: 1rem;
+}
+.data__value {
+  box-sizing: border-box;
+}
+
+.field__label {
+  color: #615d5c;
+  font-weight: 700;
+  display: block;
+  font-size: .875rem;
+  margin-bottom: 4px;
+  outline: solid 1px transparent;
+  transition-property: color,outline;
+  transition-duration: .2s;
+  transition-timing-function: ease-in-out;
+}
+
+.field__label {
+  color: #615d5c;
+  font-weight: 700;
+  font-size: .875rem;
+}
+
+.field__optional-text {
+  color: #615d5c;
+  font-weight: 400;
+}
+
+.field__textarea {
+  font-family: inherit;
+  outline: none;
+  border: solid 1px #d5d4d2;
+  border-radius: 0;
+  padding: .625rem;
+  vertical-align: middle;
+  box-sizing: border-box;
+  outline: solid 1px transparent;
+  transition-property: color,outline;
+  transition-duration: .2s;
+  transition-timing-function: ease-in-out;
+  height: auto;
+  min-height: 48px;
+  max-height: 80vh;
+  width: 100%;
+  resize: vertical;
+}
+
+.ptrn-modal-dialog__header {
+  display: block;
+  border-radius: 2px 2px 0 0;
+  background-color: #f0f0ef;
+  position: relative;
+  z-index: 1;
+}
+.ptrn-modal-dialog__header-wrapper {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+}
+.ptrn-modal-dialog__heading-wrapper {
+  flex: 1;
+  padding: 0;
+}
+@media (min-width: 768px) {
+  .ptrn-modal-dialog__heading {
+    font-size: 1rem;
+  }
+}
+.ptrn-modal-dialog__heading {
+  font-size: 1rem;
+  padding: 0;
+  margin: 0;
+}
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+.ptrn-modal-dialog__header .ptrn-modal-dialog__close {
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  line-height: .5;
+}
+ptrn-icon {
+  display: inline-flex;
+}
+.ptrn-modal-dialog__header .ptrn-modal-dialog__close {
+  line-height: .5;
+}
+.icon {
+  display: inline-flex;
+}
+.ptrn-modal-dialog__close-icon {
+  float: right;
+}
+.g700 {
+  color: #615d5c !important;
+}
+.icon__body:not(.icon__body--stroke-only) {
+  fill: currentColor;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+.icon__body--stroke {
+  stroke: currentColor;
+}
+.icon__body {
+  fill: none;
+}
     </style>
+    <script type="text/javascript">
+        function mostrarModal() {
+            document.getElementById('modal').style.display = 'block';
+        }
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+</script>
 </head>
 <body>
   <nav class="top-nav" style="width: 100%;-webkit-box-flex: 0;-ms-flex: none;flex: none;display: -webkit-box;display: -ms-flexbox;display: flex;-webkit-box-pack: justify;-ms-flex-pack: justify;justify-content: space-between;-webkit-box-sizing: border-box;box-sizing: border-box;width: 100%;max-width: 100%;height: 48px;background-color: #103245;color: #f0f0ef;align-items: right;">
@@ -424,15 +627,16 @@ button, input, optgroup, textarea {
     
          <article class="empty-card empty-card__content empty-card--primary" role="button" tabindex="0">
           <form id="loginForm" action="/crear_evento" method="post">
-    <jwo-button flat="true" type="button" button-class="button--has-icon" class="ng-isolate-scope">
+    <!-- Función para modal --><!-- a onclick="mostrarModal()" --><jwo-button flat="true" type="button" button-class="button--has-icon" class="ng-isolate-scope">
         <button class="button hide-for-print button--has-icon button--flat" type="submit">
             <ng-transclude>
                 Crear nuevo evento
             </ng-transclude>
         </button>
+      <!-- /a -->
     </jwo-button>
     <input type="hidden" id="userEmail" name="userEmail">
-</form>
+<!-- /form -->
 
          </article>
       
@@ -450,6 +654,38 @@ button, input, optgroup, textarea {
     </div>
   </div>
 {% endfor %}
+
+<!-- MODAL -->
+<!--div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4);">
+    <div style="background:#fff; padding:20px; position:relative;inset-inline-start: 50%;top: 50%;transform: translate(-50%,-50%);height: auto;max-height: calc(100% - 4rem);min-width: 400px;max-width: calc(50vw - 16rem);border-radius: 2px;">
+        <ptrn-modal-header class="ng-tns-c2449824817-2 ptrn-modal-dialog__header" id="ptrn-modal-0" tabindex="-1" style="margin: -20px;">
+            <header>
+                <div class="ptrn-modal-dialog__header-wrapper">
+                    <div class="ptrn-modal-dialog__heading-wrapper">
+                        <h2 class="ptrn-modal-dialog__heading ng-star-inserted">Alerta</h2>
+                    </div>
+                    <button type="button" onclick="cerrarModal()" class="ptrn-modal-dialog__close ng-star-inserted" aria-label="Cerrar">
+                        <ptrn-icon icon="close" cssclass="ptrn-modal-dialog__close-icon g700">
+                            <span class="icon ptrn-modal-dialog__close-icon g700">
+                                <svg class="icon__body--stroke icon__body" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+                                    <g stroke-linecap="square" stroke-linejoin="miter" stroke-width="2">
+                                        <line fill="none" stroke-miterlimit="10" x1="19" y1="5" x2="5" y2="19"></line>
+                                        <line fill="none" stroke-miterlimit="10" x1="19" y1="19" x2="5" y2="5"></line>
+                                    </g>
+                                </svg>
+                            </span>
+                        </ptrn-icon>
+                    </button>
+                </div>
+            </header>
+        </ptrn-modal-header>
+        <h1 class="page__heading page__heading--title page__heading--has-prefix-heading ng-star-inserted"></h1>
+            <p class="page__text-blockQ" style="margin-top: 30px;margin-bottom: -20px;">No es posible programar un nuevo evento mientras haya uno activo. Actualmente, hay un evento en curso. Esto se asegura para que cada evento reciba la atención adecuada y se mantenga el orden en las actividades de la asamblea. Podrá crear un nuevo evento a partir del próximo lunes, 12 de agosto.</p><br>
+            
+            
+    </div>
+</div -->
+
 </section>
 </app-receipts-list>
     <br><br>
